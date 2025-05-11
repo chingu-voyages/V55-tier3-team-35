@@ -35,7 +35,7 @@ your repo access and to practice PR'ing with your team *before* you start
 coding!
 
 - Syed Affan #1: [GitHub](http://github.com/affan880)) / [LinkedIn](http://linkedin.com/in/syed-affan/)
-- Teammate name #2: [GitHub](https://github.com/ghaccountname) / [LinkedIn](https://linkedin.com/in/liaccountname)
+- Dorene St.Marthe #2: [GitHub](https://github.com/Dorene-StMarthe)) / [LinkedIn](https://www.linkedin.com/in/dorenestmarthe/)
 
    ...
 - Teammate name #n: [GitHub](https://github.com/ghaccountname) / [LinkedIn](https://linkedin.com/in/liaccountname)
