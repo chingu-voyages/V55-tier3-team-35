@@ -36,4 +36,6 @@ coding!
 
 - Syed Affan #1: [GitHub](http://github.com/affan880) / [LinkedIn](http://linkedin.com/in/syed-affan/)
 - Jack Li #2: [GitHub](https://github.com/jackli921) / [LinkedIn](https://www.linkedin.com/in/jackli0707/)
+- Syed Affan #1: [GitHub](http://github.com/affan880)) / [LinkedIn](http://linkedin.com/in/syed-affan/)
+- Dorene St.Marthe #2: [GitHub](https://github.com/Dorene-StMarthe)) / [LinkedIn](https://www.linkedin.com/in/dorenestmarthe/)
 - Teammate name #n: [GitHub](https://github.com/ghaccountname) / [LinkedIn](https://linkedin.com/in/liaccountname)
