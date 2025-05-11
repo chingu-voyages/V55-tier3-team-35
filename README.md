@@ -36,6 +36,7 @@ coding!
 
 - Syed Affan #1: [GitHub](http://github.com/affan880)) / [LinkedIn](http://linkedin.com/in/syed-affan/)
 - Dorene St.Marthe #2: [GitHub](https://github.com/Dorene-StMarthe)) / [LinkedIn](https://www.linkedin.com/in/dorenestmarthe/)
+- Steffi Saint-Pierre #3: [GitHub](https://github.com/stefley1509)) / [LinkedIn](https://www.linkedin.com/in/steffisp/)
 
    ...
 - Teammate name #n: [GitHub](https://github.com/ghaccountname) / [LinkedIn](https://linkedin.com/in/liaccountname)
