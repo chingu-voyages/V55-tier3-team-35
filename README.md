@@ -13,6 +13,15 @@ in your `readme` feel free to replace the text we've provided here.
 
 > Own it & Make it your Own!
 
+## How To Run Github Actions (Workflow) Locally
+Run github actions locally using [act](https://github.com/nektos/act)
+1. install [Docker](https://docs.docker.com/get-started/get-docker/) Desktop and verify its installation using ```bash docker --version```
+2. install [act](https://nektosact.com/installation/index.html) depending on your OS. Check the official repository for the latest instructions
+3. verify act installation using ```bash act --version``` You should see the installed version number
+4. run the demo workflow ```bash act -W act -W .github/workflow/demo.yml``` (it will take several mins to pull the image when running for the first time)
+4. run the Frontend CI workflow: ```bash act -W .github/workflows/frontend-ci.yml```
+5. run the Backend CI workflow ```bash act -W .github/workflows/backend-ci.yml```
+
 ## Team Documents
 
 You may find these helpful as you work together to organize your project.
