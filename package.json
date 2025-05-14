@@ -3,7 +3,6 @@
   "version": "0.0.0",
   "private": true,
   "workspaces": [
-    "packages/*",
     "apps/*"
   ],
   "scripts": {
@@ -23,3 +22,4 @@
   },
   "packageManager": "npm@10.2.0"
 }
+
