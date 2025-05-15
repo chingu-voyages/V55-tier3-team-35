@@ -23,7 +23,7 @@ in your `readme` feel free to replace the text we've provided here.
 
 - Install Docker via Docker CLI. For this method, Docker Compose must also be installed separately.
 
-# Verify installation
+#### Verify installation
 
 ```bash
 docker-compose --version
