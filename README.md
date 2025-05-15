@@ -30,6 +30,16 @@ docker-compose --version
 docker --version
 ```
 
+#### Install Bun
+
+Install [Bun](https://bun.sh/docs/installation) on your local machine.
+
+Install eslint and prettier in the root of the project for .husky
+
+```bash
+bun install
+```
+
 ### Run the app in development
 
 In the root of the project, run the following command to start the app in development mode:
