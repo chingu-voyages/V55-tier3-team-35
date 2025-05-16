@@ -39,5 +39,5 @@ coding!
 - Steffi Saint-Pierre #3: [GitHub](https://github.com/stefley1509) / [LinkedIn](https://www.linkedin.com/in/steffisp/)
 - Shaimaa #4: [GitHub](https://github.com/Shaimaa01) / [LinkedIn](https://www.linkedin.com/in/shaimaa-kamel-818bab31b/)
 - Jack Li #5: [GitHub](https://github.com/jackli921) / [LinkedIn](https://www.linkedin.com/in/jackli0707/)
-
+- Angus Chang #6: [GitHub](https://github.com/changangus) / [LinkedIn](https://www.linkedin.com/in/changangus/)
 - Kuro #7: [GitHub](https://github.com/kayoMichael) / [LinkedIn](https://www.linkedin.com/in/michael-li-72115222b/)
