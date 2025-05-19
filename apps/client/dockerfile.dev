@@ -1,16 +1,15 @@
 # ============================
 # Development Stage Dockerfile
 # ============================
-FROM oven/bun:latest as dev
+FROM oven/bun:latest AS dev
 
-# Set working directory
 WORKDIR /app
+COPY bun.lock ./
 
-COPY package.json bun.lock ./
+WORKDIR /app/apps/client
+COPY apps/client/package.json ./
 
 RUN bun install
-
-COPY . .
 
 EXPOSE 5173
 

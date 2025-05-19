@@ -4,12 +4,12 @@
 FROM oven/bun:latest AS dev
 
 WORKDIR /app
+COPY bun.lock ./
 
-COPY package.json bun.lock ./
+WORKDIR /app/apps/server
+COPY apps/server/package.json ./
 
 RUN bun install
-
-COPY . .
 
 EXPOSE 3000
 
