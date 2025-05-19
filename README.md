@@ -13,6 +13,72 @@ in your `readme` feel free to replace the text we've provided here.
 
 > Own it & Make it your Own!
 
+## Local Development
+
+### Pre-requisites
+
+#### Install Docker
+
+- Install the [Docker Desktop](https://www.docker.com/products/docker-desktop/) app on your local machine, and run the app.
+
+- Install Docker via Docker CLI. For this method, Docker Compose must also be installed separately.
+
+#### Verify installation
+
+```bash
+docker-compose --version
+docker --version
+```
+
+#### Install Bun
+
+Install [Bun](https://bun.sh/docs/installation) on your local machine.
+
+Install eslint and prettier in the root of the project for .husky
+
+```bash
+bun install
+```
+
+### Run the app in development
+
+In the root of the project, run the following command to start the app in development mode:
+
+```bash
+docker-compose -f docker/docker-compose.dev.yml up --build
+```
+
+This command will build the Docker containers and start the application in development mode.
+
+#### Accessing the App
+
+- Frontend: [http://localhost:5173](http://localhost:5173)
+- Backend: [http://localhost:3000](http://localhost:3000)
+
+### Stopping the Containers
+
+To stop the running containers, press `CTRL + C` in the terminal or run:
+
+```bash
+docker-compose -f docker/docker-compose.dev.yml down
+```
+
+### Rebuilding the Containers
+
+```bash
+docker-compose -f docker/docker-compose.dev.yml up --build
+```
+
+### Viewing Logs
+
+To view the logs of a specific container, use:
+
+```bash
+docker-compose -f docker/docker-compose.dev.yml logs -f [service-name]
+```
+
+Replace `[service-name]` with `backend` or `frontend` as applicable.
+
 ## Team Documents
 
 You may find these helpful as you work together to organize your project.

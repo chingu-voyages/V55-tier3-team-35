@@ -1,0 +1,23 @@
+services:
+  frontend:
+    build:
+      context: ..
+      dockerfile: apps/client/dockerfile.dev
+    ports:
+      - "5173:5173"
+    volumes:
+      - ../apps/client:/app/apps/client
+      - /app/apps/client/node_modules
+    working_dir: /app/apps/client
+    command: bun run dev
+  backend:
+    build:
+      context: ..
+      dockerfile: apps/server/dockerfile.dev
+    ports:
+      - "3000:3000"
+    volumes:
+      - ../apps/server:/app/apps/server
+      - /app/apps/server/node_modules
+    working_dir: /app/apps/server
+    command: bun run dev

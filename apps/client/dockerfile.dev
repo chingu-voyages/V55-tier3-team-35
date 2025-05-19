@@ -1,0 +1,16 @@
+# ============================
+# Development Stage Dockerfile
+# ============================
+FROM oven/bun:latest AS dev
+
+WORKDIR /app
+COPY bun.lock ./
+
+WORKDIR /app/apps/client
+COPY apps/client/package.json ./
+
+RUN bun install
+
+EXPOSE 5173
+
+CMD ["bun", "run", "dev"]
