@@ -7,7 +7,7 @@ services:
       - "5173:5173"
     volumes:
       - ../apps/client:/app/apps/client
-      - /app/node_modules
+      - /app/apps/client/node_modules
     working_dir: /app/apps/client
     command: bun run dev
   backend:
@@ -18,6 +18,6 @@ services:
       - "3000:3000"
     volumes:
       - ../apps/server:/app/apps/server
-      - /app/node_modules
+      - /app/apps/server/node_modules
     working_dir: /app/apps/server
     command: bun run dev
