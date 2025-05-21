@@ -1,4 +1,4 @@
-import createApp from './index';
+import createApp from './src/app/createApp';
 
 const app = createApp();
 const PORT = 3000;
