@@ -4,6 +4,8 @@
   "type": "module",
   "private": true,
   "devDependencies": {
+    "@prisma/client": "^6.8.2",
+    "@types/bcrypt": "^5.0.2",
     "@types/bun": "latest",
     "@types/express": "^5.0.1",
     "@types/lodash": "^4.17.16"
@@ -13,9 +15,13 @@
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.49.5",
+    "bcrypt": "^6.0.0",
     "dotenv": "^16.5.0",
     "express": "^5.1.0",
-    "lodash": "^4.17.21"
+    "express-rate-limit": "^7.5.0",
+    "lodash": "^4.17.21",
+    "prisma": "^6.8.2",
+    "zod": "^3.25.8"
   },
   "scripts": {
     "lint": "eslint . --config ./eslint.config.js --fix",
