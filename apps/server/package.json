@@ -12,12 +12,14 @@
     "typescript": "^5"
   },
   "dependencies": {
+    "@supabase/supabase-js": "^2.49.5",
+    "dotenv": "^16.5.0",
     "express": "^5.1.0",
     "lodash": "^4.17.21"
   },
   "scripts": {
     "lint": "eslint . --config ./eslint.config.js --fix",
     "format": "prettier --config ./.prettierrc --write .",
-    "dev": "bun index.ts"
+    "dev": "bun server.ts"
   }
 }
