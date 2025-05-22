@@ -16,11 +16,7 @@ const faqs = [
     answer:
       'Your data is encrypted using bank-level security standards. We never sell your personal information and you can export or delete your data at any time.',
   },
-  {
-    question: 'Can I connect my bank account?',
-    answer:
-      'Yes, FinTrack can securely connect to thousands of financial institutions for automatic transaction importing.',
-  },
+
   {
     question: 'Is there a mobile app?',
     answer:

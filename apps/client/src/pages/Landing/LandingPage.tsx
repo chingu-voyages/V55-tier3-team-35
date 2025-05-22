@@ -1,3 +1,5 @@
+import styles from './LandingPage.module.css';
+
 import CTA from '@/components/landing/CTA';
 import FAQ from '@/components/landing/FAQ';
 import Features from '@/components/landing/Features';
@@ -7,7 +9,9 @@ import Nav from '@/components/landing/Nav';
 
 const LandingPage = () => {
   return (
-    <div className="min-h-screen bg-[#0F0F0F] overflow-x-hidden">
+    <div
+      className={`${styles.landingRoot} min-h-screen bg-[#0F0F0F] overflow-x-hidden`}
+    >
       <div className="absolute top-0 right-0 w-full h-96 bg-gradient-radial from-white/5 to-transparent opacity-30 blur-3xl z-0" />
       <Nav />
       <Hero />

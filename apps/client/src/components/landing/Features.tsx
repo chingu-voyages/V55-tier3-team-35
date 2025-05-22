@@ -1,4 +1,4 @@
-import { Sparkles, Star, BarChart3, Rocket, Tag, Wallet } from 'lucide-react';
+import { Sparkles, Star, BarChart3, Rocket, Activity, Tag } from 'lucide-react';
 
 import {
   Card,
@@ -9,12 +9,6 @@ import {
 } from '@/components/ui/card';
 
 const features = [
-  {
-    icon: <BarChart3 className="h-10 w-10 text-white" />,
-    title: 'Smart Budget Forecasting',
-    description:
-      'AI-powered prediction of your spending patterns and future expenses based on your habits.',
-  },
   {
     icon: <Sparkles className="h-10 w-10 text-white" />,
     title: 'Visual Financial Journey',
@@ -34,16 +28,22 @@ const features = [
       'Set and track your financial goals with visual progress indicators and milestone celebrations.',
   },
   {
-    icon: <Wallet className="h-10 w-10 text-white" />,
-    title: 'Bill Reminders',
-    description:
-      'Never miss a payment with customizable notifications for upcoming bills and expenses.',
-  },
-  {
     icon: <Star className="h-10 w-10 text-white" />,
     title: '100% Free',
     description:
       'FinTrack is completely free to use. No hidden fees, no premium tiers, just a great financial tool for students.',
+  },
+  {
+    icon: <Activity className="h-10 w-10 text-white" />,
+    title: 'Transaction Tracking',
+    description:
+      'Easily monitor all your transactions to keep your finances organized and up-to-date.',
+  },
+  {
+    icon: <BarChart3 className="h-10 w-10 text-white" />,
+    title: 'Visualize Monthly Spending',
+    description:
+      'View clear charts to see your monthly spending trends and identify savings opportunities.',
   },
 ];
 
