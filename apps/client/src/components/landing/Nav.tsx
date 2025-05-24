@@ -1,5 +1,6 @@
 import { Target } from 'lucide-react';
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
@@ -25,6 +26,7 @@ const NavLink = ({
 );
 
 const Nav = () => {
+  const navigate = useNavigate();
   return (
     <header className="fixed w-full top-0 z-50 bg-[#0F0F0F]/80 backdrop-blur-md border-b border-white/20">
       <div className="container mx-auto flex justify-between items-center py-4 px-4">
@@ -46,10 +48,14 @@ const Nav = () => {
           <Button
             variant="ghost"
             className=" md:flex text-white hover:text-gray-300 transition-colors"
+            onClick={() => navigate('/login')}
           >
             Log In
           </Button>
-          <Button className="bg-white text-black hover:bg-gray-200 transition-colors">
+          <Button
+            className="bg-white text-black hover:bg-gray-200 transition-colors"
+            onClick={() => navigate('/register')}
+          >
             Sign Up Free
           </Button>
         </div>
