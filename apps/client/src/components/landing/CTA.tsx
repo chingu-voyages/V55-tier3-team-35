@@ -1,10 +1,12 @@
 import { ArrowRight } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
 import StarryBackground from './StarryBackground';
 
 import { Button } from '@/components/ui/button';
 
 const CTA = () => {
+  const navigate = useNavigate();
   return (
     <section id="cta" className="py-20 relative">
       <StarryBackground count={7} />
@@ -21,7 +23,12 @@ const CTA = () => {
               expenses, build healthy money habits, and reach their financial
               goals.
             </p>
-            <Button className="bg-white text-black px-8 py-6 text-lg hover:bg-gray-200 transition-opacity">
+            <Button
+              className="bg-white text-black px-8 py-6 text-lg hover:bg-gray-200 transition-opacity"
+              onClick={() => {
+                navigate('/register');
+              }}
+            >
               Start Free Today
               <ArrowRight className="ml-2 h-5 w-5" />
             </Button>
