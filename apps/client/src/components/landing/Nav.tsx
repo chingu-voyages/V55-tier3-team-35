@@ -47,13 +47,13 @@ const Nav = () => {
         <div className="flex items-center gap-4">
           <Button
             variant="ghost"
-            className=" md:flex text-white hover:text-gray-300 transition-colors"
+            className=" md:flex text-white hover:text-gray-300 transition-colors hover:cursor-pointer"
             onClick={() => navigate('/login')}
           >
             Log In
           </Button>
           <Button
-            className="bg-white text-black hover:bg-gray-200 transition-colors"
+            className="bg-white text-black hover:bg-gray-200 transition-colors hover:cursor-pointer"
             onClick={() => navigate('/register')}
           >
             Sign Up Free

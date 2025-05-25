@@ -1,4 +1,4 @@
-import { Eye, EyeOff, Target } from 'lucide-react';
+import { Eye, EyeOff, Target, ChevronLeft } from 'lucide-react';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 
@@ -33,7 +33,12 @@ const LoginPage = () => {
       <div className="starry-bg min-h-screen flex items-center justify-center">
         <div className="w-full max-w-md bg-white rounded-xl shadow-xl p-6 md:p-10">
           <div className="flex items-center space-x-3 mb-8 md:mb-12">
-            <div className="w-10 h-10 md:w-12 md:h-12 bg-black rounded-lg flex items-center justify-center">
+            <div className="flex items-center justify-center">
+              <a href="/">
+                <ChevronLeft className="w-8 h-8 text-black" />
+              </a>
+            </div>
+            <div className="w-10 h-10 md:w-12 md:h-12 bg-black rounded-lg flex items-center justify-center ml-2">
               <Target className="w-8 h-8 text-white" />
             </div>
             <div>
