@@ -1,27 +1,10 @@
 import bcrypt from 'bcrypt';
 import type { Request, Response } from 'express';
 import jwt from 'jsonwebtoken';
-import { z } from 'zod/v4';
 
 import { env } from '../config/env';
 import { supabase } from '../database/db';
-
-const registerSchema = z.object({
-  username: z
-    .string()
-    .min(3, 'Username must be at least 3 characters long')
-    .max(30),
-  password: z
-    .string()
-    .min(8, 'Password must be at least 8 characters long')
-    .regex(/[A-Z]/, 'Password must contain at least one uppercase letter')
-    .regex(/[a-z]/, 'Password must contain at least one lowercase letter')
-    .regex(/[0-9]/, 'Password must contain at least one number')
-    .regex(
-      /[^A-Za-z0-9]/,
-      'Password must contain at least one special character',
-    ),
-});
+import { registerSchema } from '../schemas/registerSchema';
 
 export const registerUser = async (
   req: Request,
@@ -58,7 +41,7 @@ export const registerUser = async (
     const { data, error } = await supabase
       .from('users')
       .insert([{ username, password_hash }]) // data variable name must correspond to the table column name
-      .select('id, username, created_at');
+      .select('id, username, created_at, default_currency_code');
 
     if (error) {
       // check for unique constraint violation (Supabase error code for unique violation is '23505')

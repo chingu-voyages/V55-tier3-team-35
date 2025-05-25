@@ -1,0 +1,159 @@
+ .landingRoot {
+    --background: 0 0% 7%;
+    --foreground: 0 0% 98%;
+
+    --card: 0 0% 10%;
+    --card-foreground: 0 0% 98%;
+
+    --popover: 0 0% 10%;
+    --popover-foreground: 0 0% 98%;
+
+    --primary: 0 0% 98%;
+    --primary-foreground: 0 0% 7%;
+
+    --secondary: 0 0% 14.9%;
+    --secondary-foreground: 0 0% 98%;
+
+    --muted: 0 0% 14.9%;
+    --muted-foreground: 0 0% 63.9%;
+
+    --accent: 0 0% 14.9%;
+    --accent-foreground: 0 0% 98%;
+
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 0 0% 98%;
+
+    --border: 0 0% 14.9%;
+    --input: 0 0% 14.9%;
+    --ring: 0 0% 83.9%;
+
+    --radius: 0.5rem;
+
+    /* Updated chart colors to use Emerald palette */
+    --chart-1: 152 60% 52%;
+    /* emerald-500 */
+    --chart-2: 149 60% 42%;
+    /* emerald-600 */
+    --chart-3: 159 64% 32%;
+    /* emerald-700 */
+    --chart-4: 151 50% 25%;
+    /* emerald-800 */
+    --chart-5: 150 60% 16%;
+    /* emerald-900 */
+
+    /* Define color variables for charts */
+    --color-desktop: hsl(152 60% 52%);
+    --color-mobile: hsl(149 60% 42%);
+    --color-chrome: hsl(152 60% 52%);
+    --color-safari: hsl(149 60% 42%);
+    --color-firefox: hsl(159 64% 32%);
+    --color-edge: hsl(151 50% 25%);
+    --color-other: hsl(150 60% 16%);
+
+    background-color: #0F0F0F;
+    color: rgb(var(--foreground));
+}
+
+/* Global styles - These apply to ALL elements within landingRoot */
+.landingRoot * {
+    border-color: rgb(var(--border));
+}
+
+/* Make these classes available globally within landing page */
+.landingRoot :global(.starry-bg) {
+    background-color: #0F0F0F;
+    background-image:
+        radial-gradient(white, rgba(255, 255, 255, .2) 2px, transparent 2px),
+        radial-gradient(white, rgba(255, 255, 255, .15) 1px, transparent 1px),
+        radial-gradient(white, rgba(255, 255, 255, .1) 2px, transparent 2px),
+        radial-gradient(rgba(255, 255, 255, .4), rgba(255, 255, 255, .1) 2px, transparent 2px);
+    background-size: 550px 550px, 350px 350px, 250px 250px, 150px 150px;
+    background-position:
+        0 0,
+        40px 60px,
+        130px 270px,
+        70px 100px;
+}
+
+.landingRoot :global(.glow-text) {
+    text-shadow: 0 0 10px rgba(255, 255, 255, 0.5), 0 0 20px rgba(255, 255, 255, 0.3);
+}
+
+.landingRoot :global(.cosmic-card) {
+    background: rgba(25, 25, 25, 0.7);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(8px);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(255, 255, 255, 0.05);
+}
+
+.landingRoot :global(.star) {
+    position: absolute;
+    border-radius: 9999px;
+    background-color: white;
+    box-shadow: 0 0 10px 1px rgba(255, 255, 255, 0.8);
+}
+
+.landingRoot :global(.glass-button) {
+    background-color: rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    transition-property: all;
+    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+    transition-duration: 150ms;
+}
+
+.landingRoot :global(.glass-button:hover) {
+    background-color: rgba(255, 255, 255, 0.3);
+}
+
+.landingRoot :global(.nebula-pill) {
+    background-image: linear-gradient(to right, #ffffff, #cccccc);
+    color: #0F0F0F;
+    font-weight: 500;
+    padding-top: 0.25rem;
+    padding-bottom: 0.25rem;
+    padding-left: 1rem;
+    padding-right: 1rem;
+    border-radius: 9999px;
+}
+
+.landingRoot :global(.animation-delay-200) {
+    animation-delay: 0.2s;
+}
+
+.landingRoot :global(.animation-delay-400) {
+    animation-delay: 0.4s;
+}
+
+/* Custom animations */
+@keyframes twinkle {
+
+    0%,
+    100% {
+        opacity: 1;
+    }
+
+    50% {
+        opacity: 0.3;
+    }
+}
+
+@keyframes float {
+
+    0%,
+    100% {
+        transform: translateY(0);
+    }
+
+    50% {
+        transform: translateY(-10px);
+    }
+}
+
+.landingRoot :global(.animate-twinkle) {
+    animation: twinkle 2s ease-in-out infinite;
+}
+
+.landingRoot :global(.animate-float) {
+    animation: float 6s ease-in-out infinite;
+}
