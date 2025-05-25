@@ -1,9 +1,8 @@
 import type { Request, Response } from 'express';
 
-import { supabase } from '../database/db';
+import prisma from '../database/db';
 
 export const createUser = (req: Request, res: Response): void => {
-  console.log('creating user ...');
   res.json({ message: 'This route will create a new user.' });
 };
 
@@ -12,31 +11,51 @@ export const getAllUsers = async (
   res: Response,
 ): Promise<void> => {
   console.log('getting all users ...');
-  const { data, error } = await supabase.from('users').select('*');
-  if (error) {
-    console.error('Error fetcing users:', error);
-    res.status(500).json({ error: 'Fail to fetch users.' });
+  try {
+    const users = await prisma.users.findMany();
+    res.status(200).json(users);
+    return;
+  } catch (error) {
+    console.log('Failed to get users from database', error);
+    res.status(500).json({ error: 'Fail to fetch users from the database.' });
     return;
   }
-  res.status(200).json(data);
 };
 
 export const getUserById = async (
   req: Request,
   res: Response,
 ): Promise<void> => {
-  const userId = req.params.id;
-  const { data, error } = await supabase
-    .from('users')
-    .select('*')
-    .eq('id', userId)
-    .single();
-  if (error) {
-    console.error(`Error fetching user with ID ${userId}`, error);
-    res.status(404).json({ error: 'User not found.' });
+  const userIdString = req.params.id;
+  console.log(`getting user info with id ${userIdString}`);
+  if (!userIdString) {
+    res.status(400).json({ error: 'User ID is required' });
     return;
   }
-  res.status(200).json(data);
+  const userId = parseInt(userIdString, 10);
+  if (isNaN(userId)) {
+    res.status(400).json({ error: 'Invalid user ID format' });
+    return;
+  }
+
+  try {
+    const user = await prisma.users.findUnique({
+      where: {
+        id: userId,
+      },
+    });
+
+    if (!user) {
+      res.status(404).json({ error: 'User not found' });
+      return;
+    }
+    res.status(200).json(user);
+    return;
+  } catch (error) {
+    console.error('Error retrieving user info from database:', error);
+    res.status(500).json({ error: 'Internal server error.' });
+    return;
+  }
 };
 
 export const updateUser = (req: Request, res: Response): void => {

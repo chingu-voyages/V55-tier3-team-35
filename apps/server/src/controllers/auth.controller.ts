@@ -1,8 +1,9 @@
+import { Prisma } from '@prisma/client';
 import bcrypt from 'bcrypt';
 import type { Request, Response } from 'express';
 import jwt from 'jsonwebtoken';
 
-import { supabase } from '../database/db';
+import { prisma } from '../database/db';
 import { env } from '../schemas/env';
 import { registerSchema } from '../schemas/registerSchema';
 
@@ -23,13 +24,10 @@ export const registerUser = async (
 
     const { username, password } = validationResult.data;
 
-    // Supabase error handling is async and could fail silently (does not throw exceptions by default),
-    // so it's better to check for duplication explicitly instead of relying on database constraint errors only
-    const { data: existingUser } = await supabase
-      .from('users')
-      .select('id')
-      .eq('username', username)
-      .single();
+    const existingUser = await prisma.users.findUnique({
+      where: { username },
+      select: { id: true },
+    });
 
     if (existingUser) {
       res.status(409).json({ message: 'Username already taken.' });
@@ -38,38 +36,34 @@ export const registerUser = async (
 
     const saltRounds = 10;
     const password_hash = await bcrypt.hash(password, saltRounds); // hash the password saltRound number of times
-    const { data, error } = await supabase
-      .from('users')
-      .insert([{ username, password_hash }]) // data variable name must correspond to the table column name
-      .select('id, username, created_at, default_currency_code');
 
-    if (error) {
-      // check for unique constraint violation (Supabase error code for unique violation is '23505')
-      if (error.code === '23505') {
-        res
-          .status(409)
-          .json({ message: 'Username already taken.', error: error.message });
-        return;
-      }
-      console.log('Error creating user', error);
-      res.status(500).json({
-        message: 'Internal server error. Please try again later.',
-      });
-    }
-    if (!data || data.length === 0) {
-      console.error(
-        'User creation returned no data, though no explicit error.',
-      );
-      res.status(500).json({ message: 'User created, but no data returned.' });
-      return;
-    }
+    const newUser = await prisma.users.create({
+      data: {
+        username,
+        password_hash,
+      },
+      select: {
+        id: true,
+        username: true,
+        created_at: true,
+        default_currency_code: true,
+      },
+    });
 
     res.status(201).json({
       message: 'User registration successful!',
-      data: data[0],
+      data: newUser,
     });
   } catch (err) {
-    console.error('Unexpected error occurred during user creation', err);
+    if (err instanceof Prisma.PrismaClientKnownRequestError) {
+      if (err.code === 'P2002') {
+        res.status(409).json({
+          message: 'Username already taken',
+          error: 'Unique constraint violation',
+        });
+        return;
+      }
+    }
     res.status(500).json({ message: 'An unexpected error has occurred' });
   }
 };
@@ -78,25 +72,17 @@ export const logInUser = async (req: Request, res: Response): Promise<void> => {
   try {
     const { username, password } = req.body;
 
-    // validate request body
+    // Input validation
     if (!username || !password) {
       res.status(400).json({ message: 'Username and password are required.' });
       return;
     }
 
-    const { data: user, error } = await supabase
-      .from('users')
-      .select('id, username, password_hash')
-      .eq('username', username)
-      .single();
-
-    if (error) {
-      console.error('Error fetching user', error);
-      res.status(500).json({
-        message: 'Internal server error. Please try again later.',
-      });
-      return;
-    }
+    // Look up user by username
+    const user = await prisma.users.findUnique({
+      where: { username },
+      select: { id: true, username: true, password_hash: true },
+    });
 
     if (!user) {
       res.status(401).json({ message: 'Invalid username or password.' });
@@ -139,7 +125,7 @@ export const logInUser = async (req: Request, res: Response): Promise<void> => {
   } catch (err) {
     res.status(500).json({
       message: 'An unexpected error has occurred',
-      error: err,
+      error: err instanceof Error ? err.message : err,
     });
   }
 };
