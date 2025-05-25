@@ -17,5 +17,9 @@ export default function createApp(): Express {
   app.use('/api/v1/', userRouter);
   app.use('/api/v1/auth', authRouter);
 
+  app.get('/', (_, res) => {
+    res.json({ message: 'Hello World' });
+  });
+
   return app;
 }
