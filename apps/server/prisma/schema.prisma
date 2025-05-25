@@ -1,0 +1,23 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+model currencies {
+  code   String @id @db.VarChar(3)
+  name   String @db.VarChar(50)
+  symbol String @db.VarChar(10)
+}
+
+model users {
+  id                    Int       @id @unique @default(autoincrement())
+  username              String    @unique @db.VarChar(50)
+  password_hash         String    @db.VarChar(255)
+  created_at            DateTime? @default(now()) @db.Timestamptz(6)
+  default_currency_code String?   @db.VarChar(3)
+}

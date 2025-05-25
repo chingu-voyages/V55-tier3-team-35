@@ -21,6 +21,8 @@ const envSchema = z.object({
   SUPABASE_ANON_KEY: z.string(),
   NODE_ENV: z.enum(['development', 'production']),
   JWT_SECRET: z.string(),
+  DATABASE_URL: z.string(),
+  DIRECT_URL: z.string(),
 });
 
 export const env = envSchema.parse(process.env);

@@ -33,7 +33,8 @@
   },
   "private": true,
   "scripts": {
-    "prepare": "husky"
+    "prepare": "husky",
+    "install:all": "bun install && bun install --cwd apps/client && bun install --cwd apps/server"
   },
   "workspaces": [
     "apps/*",
