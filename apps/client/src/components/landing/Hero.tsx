@@ -1,5 +1,6 @@
 import { ArrowRight } from 'lucide-react';
 import { CreditCard } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
 import ChartCard from './ChartCard';
 import StarryBackground from './StarryBackground';
@@ -7,6 +8,7 @@ import StarryBackground from './StarryBackground';
 import { Button } from '@/components/ui/button';
 
 const Hero = () => {
+  const navigate = useNavigate();
   return (
     <section className="relative pt-32 pb-20 overflow-hidden">
       <StarryBackground count={20} />
@@ -30,7 +32,12 @@ const Hero = () => {
           </p>
 
           <div className="flex flex-col sm:flex-row gap-4 mb-16">
-            <Button className="bg-white text-black px-8 py-6 text-lg hover:bg-gray-200 transition-colors">
+            <Button
+              className="bg-white text-black px-8 py-6 text-lg hover:bg-gray-200 transition-colors"
+              onClick={() => {
+                navigate('/register');
+              }}
+            >
               Start Free
               <ArrowRight className="ml-2 h-5 w-5" />
             </Button>
