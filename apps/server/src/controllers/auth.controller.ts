@@ -2,8 +2,8 @@ import bcrypt from 'bcrypt';
 import type { Request, Response } from 'express';
 import jwt from 'jsonwebtoken';
 
-import { env } from '../config/env';
 import { supabase } from '../database/db';
+import { env } from '../schemas/env';
 import { registerSchema } from '../schemas/registerSchema';
 
 export const registerUser = async (
