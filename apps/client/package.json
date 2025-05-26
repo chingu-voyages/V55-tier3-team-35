@@ -15,6 +15,7 @@
     "@radix-ui/react-accordion": "^1.2.10",
     "@radix-ui/react-slot": "^1.2.2",
     "@tailwindcss/vite": "^4.1.6",
+    "axios": "^1.9.0",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "lodash": "^4.17.21",
@@ -26,7 +27,8 @@
     "recharts": "^2.15.3",
     "tailwind-merge": "^3.3.0",
     "tailwindcss": "^4.1.6",
-    "zod": "^3.25.28"
+    "zod": "^3.25.28",
+    "zustand": "^5.0.5"
   },
   "devDependencies": {
     "@types/lodash": "^4.17.16",
