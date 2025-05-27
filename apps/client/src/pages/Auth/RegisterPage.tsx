@@ -2,16 +2,26 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { ChevronLeft, Eye, EyeOff, Target } from 'lucide-react';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
+import { useNavigate } from 'react-router-dom';
 
 import { registerSchema, type RegisterSchema } from '../../lib/schema';
-import styles from '../Landing/LandingPage.module.css';
+import styles from '../landing/LandingPage.module.css';
 
 import { Button } from '@/components/ui/button';
+import { useAuthStore } from '@/stores/authStores';
+import { type AxioError } from '@/types/stores.d';
 
 const RegisterPage = () => {
-  const [isLoading, setIsLoading] = useState(false);
+  const navigate = useNavigate();
   const [registerError, setRegisterError] = useState<string | null>(null);
   const [showPassword, setShowPassword] = useState(false);
+  const {
+    isLoading,
+    isAuthenticated,
+    authRegister,
+    authLogout,
+    defaultCurrency,
+  } = useAuthStore();
   const {
     register,
     handleSubmit,
@@ -25,9 +35,29 @@ const RegisterPage = () => {
   };
 
   const onSubmit = async (data: RegisterSchema) => {
-    console.log(data);
-    setIsLoading(true);
-    setRegisterError(null);
+    authLogout();
+    try {
+      if (isAuthenticated) {
+        authLogout();
+      }
+      setRegisterError(null);
+      await authRegister(data);
+      if (defaultCurrency && isAuthenticated) {
+        navigate('/Home');
+      } else {
+        navigate('/user-details');
+      }
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        const errorMessage =
+          (error as AxioError).response?.data?.message ||
+          error.message ||
+          'An unexpected error occurred.';
+        setRegisterError(errorMessage);
+        throw new Error(errorMessage);
+      }
+      throw error;
+    }
   };
 
   return (
@@ -125,12 +155,12 @@ const RegisterPage = () => {
                 <div className="relative">
                   <input
                     type={showPassword ? 'text' : 'password'}
-                    id="password"
+                    id="confirmPassword"
                     {...register('confirmPassword')}
                     className="w-full p-2.5 md:p-3 border border-gray-300 rounded-md
                     focus:ring-2 focus:ring-indigo-500 focus:border-transparent
                     transition-all duration-200 placeholder:text-gray-400 text-black"
-                    placeholder="Enter your password"
+                    placeholder="Confirm your password"
                   />
                   <button
                     type="button"
