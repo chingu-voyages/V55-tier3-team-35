@@ -5,6 +5,7 @@ import type { Express } from 'express';
 
 import { corsOptions } from '../config/cors';
 import authRouter from '../routes/auth.routes';
+import currencyRouter from '../routes/currency.routes';
 import userRouter from '../routes/user.routes';
 
 export default function createApp(): Express {
@@ -16,6 +17,7 @@ export default function createApp(): Express {
 
   app.use('/api/v1/', userRouter);
   app.use('/api/v1/auth', authRouter);
+  app.use('/api/v1/currencies', currencyRouter);
 
   app.get('/', (_, res) => {
     res.json({ message: 'Hello World' });
