@@ -1,21 +1,10 @@
-# voyage-tasks
+# FinTrack
 
-Your project's `readme` is as important to success as your code. For
-this reason you should put as much care into its creation and maintenance
-as you would any other component of the application.
-
-If you are unsure of what should go into the `readme` let this article,
-written by an experienced Chingu, be your starting point -
-[Keys to a well written README](https://tinyurl.com/yk3wubft).
-
-And before we go there's "one more thing"! Once you decide what to include
-in your `readme` feel free to replace the text we've provided here.
-
-> Own it & Make it your Own!
+The student-friendly finance tracker that makes expense tracking and budget projection.
 
 ## Local Development
 
-### Pre-requisites
+### 1. Pre-requisites
 
 #### Install Docker
 
@@ -34,13 +23,35 @@ docker --version
 
 Install [Bun](https://bun.sh/docs/installation) on your local machine.
 
-Install eslint and prettier in the root of the project for .husky
+### 2. Clone the repo
 
 ```bash
-bun install
+git clone gh repo clone chingu-voyages/V55-tier3-team-35
+cd V55-tier3-team-35
 ```
 
-### Run the app in development
+### 3. Install dependencies
+
+install shared dependencies, client, and server dependencies in one command
+
+```bash
+bun run install:all
+```
+
+### 4. Set Up Environment Variables
+
+In the apps/server folder, create a .env file based on the env.example file and add the secret keys
+
+### 5. 4. Prisma Setup (If DB schema was changed in Supabase)
+
+Whenever changes are made directly in Supabase (e.g. new tables):
+
+```bash
+npx prisma db pull      # Pulls schema from Supabase into Prisma
+npx prisma generate     # Regenerates the Prisma client
+```
+
+### 6. Run the app in development
 
 In the root of the project, run the following command to start the app in development mode:
 
@@ -78,20 +89,6 @@ docker-compose -f docker/docker-compose.dev.yml logs -f [service-name]
 ```
 
 Replace `[service-name]` with `backend` or `frontend` as applicable.
-
-## Team Documents
-
-You may find these helpful as you work together to organize your project.
-
-- [Team Project Ideas](./docs/team_project_ideas.md)
-- [Team Decision Log](./docs/team_decision_log.md)
-
-Meeting Agenda templates (located in the `/docs` directory in this repo):
-
-- Meeting - Voyage Kickoff --> ./docs/meeting-voyage_kickoff.docx
-- Meeting - App Vision & Feature Planning --> ./docs/meeting-vision_and_feature_planning.docx
-- Meeting - Sprint Retrospective, Review, and Planning --> ./docs/meeting-sprint_retrospective_review_and_planning.docx
-- Meeting - Sprint Open Topic Session --> ./docs/meeting-sprint_open_topic_session.docx
 
 ## Our Team
 
