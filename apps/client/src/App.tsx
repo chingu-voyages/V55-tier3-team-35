@@ -4,7 +4,7 @@ import { Routes, Route } from 'react-router-dom';
 import LoginPage from './pages/auth/LoginPage';
 import RegisterPage from './pages/auth/RegisterPage';
 import UserDetailsPage from './pages/auth/UserDetailsPage';
-import HomePage from './pages/Home/HomePage';
+import HomePage from './pages/home/HomePage';
 import LandingPage from './pages/Landing/LandingPage';
 import { useAuthStore } from './stores/authStores';
 
