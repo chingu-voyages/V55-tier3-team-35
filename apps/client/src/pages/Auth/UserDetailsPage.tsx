@@ -1,4 +1,4 @@
-import { Eye, EyeOff, Target, ChevronLeft } from 'lucide-react';
+import { Target, ChevronLeft } from 'lucide-react';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useNavigate } from 'react-router-dom';
@@ -6,39 +6,24 @@ import { useNavigate } from 'react-router-dom';
 import styles from '../landing/LandingPage.module.css';
 
 import { Button } from '@/components/ui/button';
+import { type UserDetailsForm } from '@/lib/schema';
 import { useAuthStore } from '@/stores/authStores';
 import { type AxioError } from '@/types/stores.d';
 
-type LoginFormData = {
-  username: string;
-  password: string;
-};
-
-const LoginPage = () => {
+const UserDetailsPage = () => {
   const [error, setError] = useState<string | null>(null);
-  const [showPassword, setShowPassword] = useState(false);
-  const { isLoading, isAuthenticated, defaultCurrency, authLogin, authLogout } =
-    useAuthStore();
+  const { isLoading, saveUserDetails } = useAuthStore();
   const navigate = useNavigate();
 
-  const togglePasswordVisibility = () => {
-    setShowPassword(!showPassword);
-  };
+  const { register, handleSubmit } = useForm<UserDetailsForm>();
 
-  const { register, handleSubmit } = useForm<LoginFormData>();
-
-  const onSubmit = async (data: LoginFormData) => {
+  const onSubmit = async (data: UserDetailsForm) => {
     try {
-      if (isAuthenticated) {
-        authLogout();
-      }
       setError(null);
-      const response = await authLogin(data);
+      const response = await saveUserDetails(data);
       console.log('######RESPONSE########################', response);
-      if (defaultCurrency) {
+      if (response !== null) {
         navigate('/Home');
-      } else {
-        navigate('/user-details');
       }
     } catch (error: unknown) {
       if (error instanceof Error) {
@@ -46,7 +31,7 @@ const LoginPage = () => {
           (error as AxioError).response?.data?.message ||
           error.message ||
           'An unexpected error occurred.';
-        throw new Error(errorMessage);
+        setError(errorMessage);
       }
       throw error;
     }
@@ -77,7 +62,7 @@ const LoginPage = () => {
 
           <div className="space-y-6 md:space-y-10">
             <h1 className="text-xl md:text-2xl lg:text-4xl font-bold text-black text-center">
-              Login
+              User Details
             </h1>
 
             <form
@@ -86,46 +71,73 @@ const LoginPage = () => {
             >
               <div className="flex flex-col gap-1.5 md:gap-2">
                 <label htmlFor="username" className="text-sm text-gray-600">
-                  Username
+                  First Name
                 </label>
                 <input
                   type="text"
-                  id="username"
-                  {...register('username')}
+                  id="firstName"
+                  {...register('firstName')}
                   className="w-full p-2.5 md:p-3 border border-gray-300 rounded-md
                   focus:ring-2 focus:ring-indigo-500 focus:border-transparent
                   transition-all duration-200 placeholder:text-gray-400 
                   text-black"
-                  placeholder="Enter your username"
+                  placeholder="Enter your first name"
+                />
+              </div>
+              <div className="flex flex-col gap-1.5 md:gap-2">
+                <label htmlFor="username" className="text-sm text-gray-600">
+                  Last Name
+                </label>
+                <input
+                  type="text"
+                  id="lastName"
+                  {...register('lastName')}
+                  className="w-full p-2.5 md:p-3 border border-gray-300 rounded-md
+                  focus:ring-2 focus:ring-indigo-500 focus:border-transparent
+                  transition-all duration-200 placeholder:text-gray-400 
+                  text-black"
+                  placeholder="Enter your last name"
                 />
               </div>
 
               <div className="flex flex-col gap-1.5 md:gap-2">
-                <label htmlFor="password" className="text-sm text-gray-600">
-                  Password
+                <label
+                  htmlFor="default_currency"
+                  className="text-sm text-gray-600"
+                >
+                  Currency
                 </label>
-                <div className="relative">
-                  <input
-                    type={showPassword ? 'text' : 'password'}
-                    id="password"
-                    {...register('password')}
-                    className="w-full p-2.5 md:p-3 border border-gray-300 rounded-md
-                    focus:ring-2 focus:ring-indigo-500 focus:border-transparent
-                    transition-all duration-200 placeholder:text-gray-400 text-black"
-                    placeholder="Enter your password"
-                  />
-                  <button
-                    type="button"
-                    onClick={togglePasswordVisibility}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700"
-                  >
-                    {showPassword ? (
-                      <EyeOff className="h-5 w-5" />
-                    ) : (
-                      <Eye className="h-5 w-5" />
-                    )}
-                  </button>
-                </div>
+                <select
+                  id="default_currency"
+                  {...register('default_currency')}
+                  className="w-full p-2.5 md:p-3 border border-gray-300 rounded-md
+                  focus:ring-2 focus:ring-indigo-500 focus:border-transparent
+                  transition-all duration-200 placeholder:text-gray-400 
+                  text-black"
+                >
+                  <option value="USD">USD</option>
+                  <option value="EUR">EUR</option>
+                  <option value="GBP">GBP</option>
+                  <option value="INR">INR</option>
+                </select>
+              </div>
+              <div className="flex flex-col gap-1.5 md:gap-2">
+                <label
+                  htmlFor="default_currency"
+                  className="text-sm text-gray-600"
+                >
+                  Monthly Budget
+                </label>
+                <input
+                  type="number"
+                  id="monthly_budget"
+                  {...register('monthly_budget')}
+                  className="w-full p-2.5 md:p-3 border border-gray-300 rounded-md
+                  focus:ring-2 focus:ring-indigo-500 focus:border-transparent
+                  transition-all duration-200 placeholder:text-gray-400 
+                  text-black"
+                  placeholder="Enter your monthly budget"
+                />
               </div>
 
               {error && (
@@ -141,20 +153,8 @@ const LoginPage = () => {
                 transition-colors duration-200 shadow-sm
                 disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                {isLoading ? 'Logging in...' : 'Login'}
+                {isLoading ? 'Saving...' : 'Save Details'}
               </Button>
-
-              <div className="text-center mt-4 md:mt-6">
-                <p className="text-sm text-gray-600">
-                  Don't have an account?{' '}
-                  <a
-                    href="/register"
-                    className="text-indigo-600 hover:text-black-700 font-medium"
-                  >
-                    Register
-                  </a>
-                </p>
-              </div>
             </form>
           </div>
         </div>
@@ -163,4 +163,4 @@ const LoginPage = () => {
   );
 };
 
-export default LoginPage;
+export default UserDetailsPage;
