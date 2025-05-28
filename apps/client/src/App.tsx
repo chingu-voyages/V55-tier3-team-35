@@ -1,9 +1,9 @@
 import { useEffect } from 'react';
 import { Routes, Route } from 'react-router-dom';
 
-import LoginPage from './pages/auth/LoginPage';
-import RegisterPage from './pages/auth/RegisterPage';
-import UserDetailsPage from './pages/auth/UserDetailsPage';
+import LoginPage from './pages/Auth/LoginPage';
+import RegisterPage from './pages/Auth/RegisterPage';
+import UserDetailsPage from './pages/Auth/UserDetailsPage';
 import HomePage from './pages/home/HomePage';
 import LandingPage from './pages/Landing/LandingPage';
 import { useAuthStore } from './stores/authStores';

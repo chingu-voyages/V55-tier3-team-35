@@ -5,7 +5,7 @@ import { useForm } from 'react-hook-form';
 import { useNavigate } from 'react-router-dom';
 
 import { registerSchema, type RegisterSchema } from '../../lib/schema';
-import styles from '../landing/LandingPage.module.css';
+import styles from '../Landing/LandingPage.module.css';
 
 import { Button } from '@/components/ui/button';
 import { useAuthStore } from '@/stores/authStores';
