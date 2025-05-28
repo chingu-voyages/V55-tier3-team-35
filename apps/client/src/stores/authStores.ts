@@ -34,6 +34,7 @@ export const useAuthStore = create<AuthState>((set) => ({
       });
       return response;
     } catch (error: unknown) {
+      set({ isLoading: false, isAuthenticated: false });
       if (error instanceof Error) {
         const errorMessage =
           (error as AxioError).response?.data?.message ||
@@ -41,7 +42,6 @@ export const useAuthStore = create<AuthState>((set) => ({
           'An unexpected error occurred.';
         throw new Error(errorMessage);
       }
-      set({ isLoading: false, isAuthenticated: false });
       throw error;
     }
   },
@@ -65,6 +65,7 @@ export const useAuthStore = create<AuthState>((set) => ({
         isLoading: false,
       });
     } catch (error: unknown) {
+      set({ isLoading: false, isAuthenticated: false });
       if (error instanceof Error) {
         const errorMessage =
           (error as AxioError).response?.data?.message ||
@@ -72,7 +73,6 @@ export const useAuthStore = create<AuthState>((set) => ({
           'An unexpected error occurred.';
         throw new Error(errorMessage);
       }
-      set({ isLoading: false, isAuthenticated: false });
       throw error;
     }
   },
