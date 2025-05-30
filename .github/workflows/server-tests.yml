@@ -1,0 +1,55 @@
+name: Server tests
+
+on:
+  push:
+    branches:
+      - main
+      - development
+      - "feat/**"
+    paths:
+      - "/apps/server/**"
+      - ".github/workflows/server-tests.yml"
+  pull_request:
+    branches:
+      - main
+      - development
+      - "feat/**"
+    paths:
+      - "/apps/server/**"
+      - ".github/workflows/server-tests.yml"
+jobs:
+  test-server:
+    runs-on: ubuntu-latest
+    env:
+      SUPABASE_URL: ${{ secrets.SUPABASE_URL_TEST }}
+      SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY_TEST }}
+      JWT_SECRET: ${{ secrets.JWT_SECRET_TEST }}
+      DATABASE_URL: ${{ secrets.DATABASE_URL_TEST }}
+      DIRECT_URL: ${{ secrets.DIRECT_URL_TEST }}
+      NODE_ENV: test
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Setup Bun
+        id: setup-bun
+        uses: oven-sh/setup-bun@v1
+        with:
+          bun-version: latest
+        # Only for local speedups with act
+      - name: Cache Bun install cache for local runs
+        if: env.ACT  # set ACT=true in your local .env or secrets
+        uses: actions/cache@v3
+        with:
+            path: ~/.bun/install/cache
+            key: ${{ runner.os }}-bun-${{ hashFiles('bun.lockb') }}
+            restore-keys: |
+              ${{ runner.os }}-bun-
+      - name: Install dependencies in server app
+        run: bun install --frozen-lockfile
+        working-directory: ./apps/server
+      - name: Generate Prisma Client
+        run: bunx prisma generate
+        working-directory: ./apps/server
+      - name: Run unit tests for server app
+        run: bun run test
+        working-directory: ./apps/server

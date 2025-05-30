@@ -39,5 +39,8 @@
   "workspaces": [
     "apps/*",
     "packages/*"
-  ]
+  ],
+  "dependencies": {
+    "supertest": "^7.1.1"
+  }
 }
