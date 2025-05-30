@@ -19,7 +19,7 @@ if (existsSync(envLocalPath)) {
 const envSchema = z.object({
   SUPABASE_URL: z.string(),
   SUPABASE_ANON_KEY: z.string(),
-  NODE_ENV: z.enum(['development', 'production']),
+  NODE_ENV: z.enum(['development', 'production', 'test']),
   JWT_SECRET: z.string(),
   DATABASE_URL: z.string(),
   DIRECT_URL: z.string(),

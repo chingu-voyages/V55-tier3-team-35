@@ -71,7 +71,6 @@ export const registerUser = async (
 export const logInUser = async (req: Request, res: Response): Promise<void> => {
   try {
     const { username, password } = req.body;
-
     // Input validation
     if (!username || !password) {
       res.status(400).json({ message: 'Username and password are required.' });

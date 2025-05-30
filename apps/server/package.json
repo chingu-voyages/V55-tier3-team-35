@@ -11,7 +11,8 @@
     "@types/cors": "^2.8.18",
     "@types/express": "^5.0.1",
     "@types/jsonwebtoken": "^9.0.9",
-    "@types/lodash": "^4.17.16"
+    "@types/lodash": "^4.17.16",
+    "vitest": "^3.1.4"
   },
   "peerDependencies": {
     "typescript": "^5"
@@ -34,6 +35,7 @@
   "scripts": {
     "lint": "eslint . --config ./eslint.config.js --fix",
     "format": "prettier --config ./.prettierrc --write .",
-    "dev": "bun server.ts"
+    "dev": "bun server.ts",
+    "test": "vitest"
   }
 }
