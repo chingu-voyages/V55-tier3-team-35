@@ -4,6 +4,7 @@ import express from 'express';
 import type { Express } from 'express';
 
 import { corsOptions } from '../config/cors';
+import { errorHandler } from '../middleware/globalErrorHandler';
 import authRouter from '../routes/auth.routes';
 import currencyRouter from '../routes/currency.routes';
 import userRouter from '../routes/user.routes';
@@ -15,13 +16,15 @@ export default function createApp(): Express {
   app.use(express.json());
   app.use(cors(corsOptions));
 
-  app.use('/api/v1/', userRouter);
+  app.use('/api/v1/user', userRouter);
   app.use('/api/v1/auth', authRouter);
   app.use('/api/v1/currencies', currencyRouter);
 
   app.get('/', (_, res) => {
     res.json({ message: 'Hello World' });
   });
+
+  app.use(errorHandler);
 
   return app;
 }
