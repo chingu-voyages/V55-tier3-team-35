@@ -2,6 +2,7 @@
 import API from './axiosConfig'; // Your configured Axios instance
 
 import { type AxioError } from '@/types/stores.d';
+
 /**
  * Generic API call function.
  * Handles try/catch, loading states, and error messages.
