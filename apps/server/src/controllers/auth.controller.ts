@@ -12,7 +12,6 @@ export const registerUser = async (
   res: Response,
 ): Promise<void> => {
   try {
-    // validate request body
     const validationResult = registerSchema.safeParse(req.body);
     if (!validationResult.success) {
       res.status(400).json({
@@ -46,9 +45,27 @@ export const registerUser = async (
         id: true,
         username: true,
         created_at: true,
-        default_currency_code: true,
       },
     });
+    const templateCategories = await prisma.category_templates.findMany();
+    if (!templateCategories.length) {
+      throw new Error('No template categories found.');
+    }
+    const userCategoryData = templateCategories.map((template) => ({
+      name: template.name,
+      is_user_created: false,
+      user_id: newUser.id,
+    }));
+
+    const createdCategories = await prisma.categories.createMany({
+      data: userCategoryData,
+    });
+
+    if (createdCategories.count != templateCategories.length) {
+      console.warn(
+        `Expected to create ${templateCategories.length} categories, but only created ${createdCategories.count}`,
+      );
+    }
 
     res.status(201).json({
       message: 'User registration successful!',
@@ -64,6 +81,7 @@ export const registerUser = async (
         return;
       }
     }
+    console.error('Unexpected error occurred', err);
     res.status(500).json({ message: 'An unexpected error has occurred' });
   }
 };
