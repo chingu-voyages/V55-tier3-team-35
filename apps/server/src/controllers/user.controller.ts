@@ -1,6 +1,8 @@
 import type { Request, Response } from 'express';
 
 import prisma from '../database/db';
+import { updateUserSchema } from '../schemas/updateUserSchema';
+import { userService } from '../services/user.service';
 
 export const createUser = (req: Request, res: Response): void => {
   res.json({ message: 'This route will create a new user.' });
@@ -58,8 +60,17 @@ export const getUserById = async (
   }
 };
 
-export const updateUser = (req: Request, res: Response): void => {
-  res.json({ message: 'This route will update an existing user.' });
+export const updateUser = async (req: Request, res: Response) => {
+  const validationResult = updateUserSchema.safeParse(req.body);
+  if (!validationResult.success) {
+    res.status(400).json({
+      message: 'Invalid input',
+      error: validationResult.error.format(),
+    });
+    return;
+  }
+  await userService.updateUserDetails(validationResult.data);
+  res.status(200).json({ message: 'User profile updated successfully.' });
 };
 
 export const deleteUser = (req: Request, res: Response): void => {

@@ -22,6 +22,8 @@ model users {
   password_hash       String             @db.VarChar(255)
   created_at          DateTime?          @default(now()) @db.Timestamptz(6)
   default_currency_id Int?
+  first_name          String?            @db.VarChar(200)
+  last_name           String?            @db.VarChar(200)
   categories          categories[]
   category_budgets    category_budgets[]
   transactions        transactions[]
