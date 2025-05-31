@@ -46,7 +46,7 @@ export const registerUser = async (
         id: true,
         username: true,
         created_at: true,
-        default_currency_code: true,
+        default_currency_id: true,
       },
     });
 
@@ -127,4 +127,14 @@ export const logInUser = async (req: Request, res: Response): Promise<void> => {
       error: err instanceof Error ? err.message : err,
     });
   }
+};
+
+export const logOutUser = (req: Request, res: Response): void => {
+  res.clearCookie('token', {
+    httpOnly: true,
+    sameSite: 'strict',
+    secure: true,
+  });
+
+  res.status(302).redirect('/api/v1/auth/login');
 };
