@@ -47,8 +47,9 @@ In the apps/server folder, create a .env file based on the env.example file and 
 Whenever changes are made directly in Supabase (e.g. new tables):
 
 ```bash
-npx prisma db pull      # Pulls schema from Supabase into Prisma
-npx prisma generate     # Regenerates the Prisma client
+cd apps/server
+bunx prisma db pull      # Pulls schema from Supabase into Prisma
+bunx prisma generate     # Regenerates the Prisma client
 ```
 
 ### 6. Run the app in development
