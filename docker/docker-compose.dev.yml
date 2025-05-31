@@ -20,4 +20,5 @@ services:
       - ../apps/server:/app/apps/server
       - /app/apps/server/node_modules
     working_dir: /app/apps/server
-    command: bun run dev
+    command: >
+      bash -c "bunx prisma db pull && bunx prisma generate && bun --watch server.ts"

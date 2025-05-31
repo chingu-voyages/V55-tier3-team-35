@@ -30,7 +30,7 @@ model users {
 
 model categories {
   id               Int                @id(map: "cartegories_pkey") @default(autoincrement())
-  name             String             @unique(map: "cartegories_name_key") @db.VarChar(100)
+  name             String             @db.VarChar(100)
   user_id          Int
   is_active        Boolean?           @default(true)
   created_at       DateTime           @default(now()) @db.Timestamp(6)
