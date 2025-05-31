@@ -46,7 +46,7 @@ export const registerUser = async (
         id: true,
         username: true,
         created_at: true,
-        default_currency_code: true,
+        default_currency_id: true,
       },
     });
 

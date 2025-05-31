@@ -22,6 +22,8 @@ model users {
   password_hash       String             @db.VarChar(255)
   created_at          DateTime?          @default(now()) @db.Timestamptz(6)
   default_currency_id Int?
+  first_name          String?            @db.VarChar(200)
+  last_name           String?            @db.VarChar(200)
   categories          categories[]
   category_budgets    category_budgets[]
   transactions        transactions[]
@@ -30,7 +32,7 @@ model users {
 
 model categories {
   id               Int                @id(map: "cartegories_pkey") @default(autoincrement())
-  name             String             @unique(map: "cartegories_name_key") @db.VarChar(100)
+  name             String             @db.VarChar(100)
   user_id          Int
   is_active        Boolean?           @default(true)
   created_at       DateTime           @default(now()) @db.Timestamp(6)
