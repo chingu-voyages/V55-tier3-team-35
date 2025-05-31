@@ -168,3 +168,13 @@ export const logInUser = async (
     next(err);
   }
 };
+
+export const logOutUser = (req: Request, res: Response): void => {
+  res.clearCookie('token', {
+    httpOnly: true,
+    sameSite: 'strict',
+    secure: true,
+  });
+
+  res.status(302).redirect('/api/v1/auth/login');
+};
