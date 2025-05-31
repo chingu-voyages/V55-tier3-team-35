@@ -7,7 +7,7 @@ on:
       - development
       - "feat/**"
     paths:
-      - "/apps/server/**"
+      - "apps/server/**"
       - ".github/workflows/server-tests.yml"
   pull_request:
     branches:
@@ -15,7 +15,7 @@ on:
       - development
       - "feat/**"
     paths:
-      - "/apps/server/**"
+      - "apps/server/**"
       - ".github/workflows/server-tests.yml"
 jobs:
   test-server:

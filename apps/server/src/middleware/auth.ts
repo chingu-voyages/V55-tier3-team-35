@@ -3,21 +3,23 @@ import jwt, { type JWTPayload } from 'jsonwebtoken';
 
 import { env } from '../schemas/env';
 
-const requireAuth = (req: Request, res: Response, next: NextFunction) => {
+const requireAuth = (req: Request, res: Response, next: NextFunction): void => {
   try {
     const token = req.cookies.token;
     if (!token) {
-      return res.status(401).json({
+      res.status(401).json({
         error: 'Access denied. No token provided.',
       });
+      return;
     }
 
     const decoded = jwt.verify(token, env.JWT_SECRET) as JWTPayload;
 
     if (!decoded.userId || !decoded.username) {
-      return res.status(401).json({
+      res.status(401).json({
         error: 'Invalid token payload.',
       });
+      return;
     }
 
     req.user = {
@@ -30,6 +32,7 @@ const requireAuth = (req: Request, res: Response, next: NextFunction) => {
     next();
   } catch {
     res.status(401).json({ error: 'Invalid token.' });
+    return;
   }
 };
 
