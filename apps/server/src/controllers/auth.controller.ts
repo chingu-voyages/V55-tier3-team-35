@@ -45,6 +45,7 @@ export const registerUser = async (
         id: true,
         username: true,
         created_at: true,
+        default_currency_id: true,
       },
     });
     const templateCategories = await prisma.category_templates.findMany();
@@ -98,7 +99,12 @@ export const logInUser = async (req: Request, res: Response): Promise<void> => {
     // Look up user by username
     const user = await prisma.users.findUnique({
       where: { username },
-      select: { id: true, username: true, password_hash: true },
+      select: {
+        id: true,
+        username: true,
+        password_hash: true,
+        default_currency_id: true,
+      },
     });
 
     if (!user) {
@@ -137,6 +143,7 @@ export const logInUser = async (req: Request, res: Response): Promise<void> => {
       user: {
         id: user.id,
         username: user.username,
+        defaultCurrencyId: user.default_currency_id,
       },
     });
   } catch (err) {
