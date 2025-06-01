@@ -67,9 +67,14 @@ export const registerUser = async (
       );
     }
 
+    const currencies = await prisma.currencies.findMany({});
+
     res.status(201).json({
       message: 'User registration successful!',
-      data: newUser,
+      data: {
+        user: newUser,
+        currencies: currencies,
+      },
     });
   } catch (err) {
     if (err instanceof Prisma.PrismaClientKnownRequestError) {
