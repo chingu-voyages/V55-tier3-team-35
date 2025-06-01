@@ -1,4 +1,4 @@
-import type { Request, Response } from 'express';
+import type { NextFunction, Request, Response } from 'express';
 
 import prisma from '../database/db';
 import { updateUserSchema } from '../schemas/updateUserSchema';
@@ -11,25 +11,24 @@ export const createUser = (req: Request, res: Response): void => {
 export const getAllUsers = async (
   req: Request,
   res: Response,
+  next: NextFunction,
 ): Promise<void> => {
   console.log('getting all users ...');
   try {
     const users = await prisma.users.findMany();
     res.status(200).json(users);
     return;
-  } catch (error) {
-    console.log('Failed to get users from database', error);
-    res.status(500).json({ error: 'Fail to fetch users from the database.' });
-    return;
+  } catch (err) {
+    next(err);
   }
 };
 
 export const getUserById = async (
   req: Request,
   res: Response,
+  next: NextFunction,
 ): Promise<void> => {
   const userIdString = req.params.id;
-  console.log(`getting user info with id ${userIdString}`);
   if (!userIdString) {
     res.status(400).json({ error: 'User ID is required' });
     return;
@@ -53,24 +52,30 @@ export const getUserById = async (
     }
     res.status(200).json(user);
     return;
-  } catch (error) {
-    console.error('Error retrieving user info from database:', error);
-    res.status(500).json({ error: 'Internal server error.' });
-    return;
+  } catch (err) {
+    next(err);
   }
 };
 
-export const updateUser = async (req: Request, res: Response) => {
-  const validationResult = updateUserSchema.safeParse(req.body);
-  if (!validationResult.success) {
-    res.status(400).json({
-      message: 'Invalid input',
-      error: validationResult.error.format(),
-    });
-    return;
+export const updateUser = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
+  try {
+    const validationResult = updateUserSchema.safeParse(req.body);
+    if (!validationResult.success) {
+      res.status(400).json({
+        message: 'Invalid input',
+        error: validationResult.error.format(),
+      });
+      return;
+    }
+    await userService.updateUserDetails(validationResult.data);
+    res.status(200).json({ message: 'User profile updated successfully.' });
+  } catch (err) {
+    next(err);
   }
-  await userService.updateUserDetails(validationResult.data);
-  res.status(200).json({ message: 'User profile updated successfully.' });
 };
 
 export const deleteUser = (req: Request, res: Response): void => {
