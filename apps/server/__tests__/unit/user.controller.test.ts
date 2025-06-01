@@ -33,7 +33,7 @@ describe('User controller', () => {
     ).mockResolvedValue(undefined);
 
     const response = await request(app)
-      .put(TEST_END_POINT)
+      .patch(TEST_END_POINT)
       .send(validUserData)
       .expect(200);
 
@@ -53,7 +53,7 @@ describe('User controller', () => {
     };
 
     const response = await request(app)
-      .put(TEST_END_POINT)
+      .patch(TEST_END_POINT)
       .send(invalidUserData)
       .expect(400);
 
@@ -72,7 +72,7 @@ describe('User controller', () => {
     };
 
     const response = await request(app)
-      .put(TEST_END_POINT)
+      .patch(TEST_END_POINT)
       .send(invalidTypeData)
       .expect(400);
 
@@ -93,7 +93,7 @@ describe('User controller', () => {
       userService.updateUserDetails as ReturnType<typeof vi.fn>
     ).mockRejectedValue(serviceError);
 
-    await request(app).put(TEST_END_POINT).send(validUserData).expect(500); // Assuming your app has error handling middleware
+    await request(app).patch(TEST_END_POINT).send(validUserData).expect(500); // Assuming your app has error handling middleware
 
     // Verify the service was called
     expect(userService.updateUserDetails).toHaveBeenCalledTimes(1);
@@ -102,7 +102,7 @@ describe('User controller', () => {
 
   it('should handle empty request body', async () => {
     const response = await request(app)
-      .put(TEST_END_POINT)
+      .patch(TEST_END_POINT)
       .send({})
       .expect(400);
 
