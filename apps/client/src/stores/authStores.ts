@@ -58,7 +58,11 @@ export const useAuthStore = create<AuthState>()((set) => ({
       set({
         token: response.token,
         isAuthenticated: true,
-        user: response.user,
+        user: {
+          id: response.data.id,
+          username: response.data.username,
+          defaultCurrencyId: response.data.default_currency_id,
+        },
         isLoading: false,
       });
     } catch (error: unknown) {

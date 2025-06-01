@@ -15,13 +15,7 @@ const RegisterPage = () => {
   const navigate = useNavigate();
   const [registerError, setRegisterError] = useState<string | null>(null);
   const [showPassword, setShowPassword] = useState(false);
-  const {
-    isLoading,
-    isAuthenticated,
-    authRegister,
-    authLogout,
-    defaultCurrency,
-  } = useAuthStore();
+  const { isLoading, authRegister, defaultCurrency } = useAuthStore();
   const {
     register,
     handleSubmit,
@@ -35,15 +29,11 @@ const RegisterPage = () => {
   };
 
   const onSubmit = async (data: RegisterSchema) => {
-    authLogout();
     try {
-      if (isAuthenticated) {
-        authLogout();
-      }
       setRegisterError(null);
       await authRegister(data);
-      if (defaultCurrency && isAuthenticated) {
-        navigate('/Home');
+      if (defaultCurrency) {
+        navigate('/home');
       } else {
         navigate('/user-details');
       }
