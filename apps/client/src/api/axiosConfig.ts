@@ -1,12 +1,13 @@
 // src/api/axiosConfig.js
-import axios from 'axios';
+import axios, { type AxiosResponse, type AxiosError } from 'axios';
 
 const API = axios.create({
-  baseURL: 'http://localhost:3000/api/v1',
+  baseURL: import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000/api/v1',
   headers: {
     'Content-Type': 'application/json',
   },
   timeout: 10000,
+  withCredentials: true, // Enable sending cookies with requests
 });
 
 API.interceptors.request.use(
@@ -21,11 +22,18 @@ API.interceptors.request.use(
 );
 
 API.interceptors.response.use(
-  (response) => response,
-  (error) => {
+  (response: AxiosResponse) => response,
+  (error: AxiosError) => {
     if (error.response && error.response.status === 401) {
       console.warn('Unauthorized request. Redirecting to login...');
-      localStorage.removeItem('token');
+
+      // Clear authentication state
+      import('../stores/authStores').then(({ useAuthStore }) => {
+        useAuthStore.getState().authLogout();
+      });
+
+      // Redirect to login page for better UX
+      window.location.href = '/login';
     }
     return Promise.reject(error);
   },

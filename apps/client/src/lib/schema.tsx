@@ -41,7 +41,6 @@ export const userDetailsForm = z.object({
   default_currency: z
     .string()
     .min(1, { message: 'Default currency is required' }),
-  monthly_budget: z.number().min(1, { message: 'Monthly budget is required' }),
 });
 
 export type LoginFormData = z.infer<typeof loginSchema>;

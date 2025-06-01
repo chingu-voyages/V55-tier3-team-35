@@ -14,6 +14,8 @@ export interface AuthState {
 interface User {
   id: number | null;
   username: string | null;
+  firstName?: string | null;
+  lastName?: string | null;
 }
 
 export interface AuthLoginData {
@@ -30,7 +32,13 @@ export interface UserDetailsForm {
   firstName: string;
   lastName: string;
   default_currency: string;
-  monthly_budget: number;
+}
+
+export interface Currency {
+  id: number;
+  name: string;
+  symbol: string;
+  code: string;
 }
 
 interface AxioError {

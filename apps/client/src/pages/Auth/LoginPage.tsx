@@ -17,8 +17,7 @@ type LoginFormData = {
 const LoginPage = () => {
   const [error, setError] = useState<string | null>(null);
   const [showPassword, setShowPassword] = useState(false);
-  const { isLoading, isAuthenticated, defaultCurrency, authLogin, authLogout } =
-    useAuthStore();
+  const { isLoading, defaultCurrency, authLogin } = useAuthStore();
   const navigate = useNavigate();
 
   const togglePasswordVisibility = () => {
@@ -28,15 +27,12 @@ const LoginPage = () => {
   const { register, handleSubmit } = useForm<LoginFormData>();
 
   const onSubmit = async (data: LoginFormData) => {
+    setError(null);
     try {
-      if (isAuthenticated) {
-        authLogout();
-      }
-      setError(null);
       const response = await authLogin(data);
       console.log('######RESPONSE########################', response);
       if (defaultCurrency) {
-        navigate('/Home');
+        navigate('/home');
       } else {
         navigate('/user-details');
       }
