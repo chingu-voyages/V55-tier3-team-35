@@ -68,8 +68,21 @@ export const registerUser = async (
       );
     }
 
+    // Generate JWT token for the newly registered user
+    const token = jwt.sign(
+      {
+        userId: newUser.id,
+        username: newUser.username,
+      },
+      env.JWT_SECRET as string,
+      {
+        expiresIn: '48h',
+      },
+    );
+
     res.status(201).json({
       message: 'User registration successful!',
+      token,
       data: newUser,
     });
   } catch (err) {

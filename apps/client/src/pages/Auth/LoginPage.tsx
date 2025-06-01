@@ -1,10 +1,13 @@
 import { Eye, EyeOff, Target, ChevronLeft } from 'lucide-react';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
+import { useNavigate } from 'react-router-dom';
 
 import styles from '../Landing/LandingPage.module.css';
 
 import { Button } from '@/components/ui/button';
+import { useAuthStore } from '@/stores/authStores';
+import { type AxioError } from '@/types/stores.d';
 
 type LoginFormData = {
   username: string;
@@ -12,9 +15,10 @@ type LoginFormData = {
 };
 
 const LoginPage = () => {
-  const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [showPassword, setShowPassword] = useState(false);
+  const { isLoading, authLogin } = useAuthStore();
+  const navigate = useNavigate();
 
   const togglePasswordVisibility = () => {
     setShowPassword(!showPassword);
@@ -23,9 +27,26 @@ const LoginPage = () => {
   const { register, handleSubmit } = useForm<LoginFormData>();
 
   const onSubmit = async (data: LoginFormData) => {
-    console.log(data);
-    setIsLoading(true);
     setError(null);
+    try {
+      const response = await authLogin(data);
+
+      if (response.user.defaultCurrencyId) {
+        navigate('/home');
+      } else {
+        navigate('/user-details');
+      }
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        const errorMessage =
+          (error as AxioError).response?.data?.message ||
+          error.message ||
+          'An unexpected error occurred.';
+        setError(errorMessage);
+      } else {
+        setError('An unexpected error occurred.');
+      }
+    }
   };
 
   return (
