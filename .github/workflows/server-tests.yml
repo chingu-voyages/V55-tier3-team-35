@@ -45,7 +45,7 @@ jobs:
             restore-keys: |
               ${{ runner.os }}-bun-
       - name: Install dependencies in server app
-        run: bun install --frozen-lockfile
+        run: bun install
         working-directory: ./apps/server
       - name: Generate Prisma Client
         run: bunx prisma generate

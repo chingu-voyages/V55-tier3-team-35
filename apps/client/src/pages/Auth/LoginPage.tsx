@@ -17,7 +17,7 @@ type LoginFormData = {
 const LoginPage = () => {
   const [error, setError] = useState<string | null>(null);
   const [showPassword, setShowPassword] = useState(false);
-  const { isLoading, defaultCurrency, authLogin } = useAuthStore();
+  const { isLoading, authLogin } = useAuthStore();
   const navigate = useNavigate();
 
   const togglePasswordVisibility = () => {
@@ -30,8 +30,8 @@ const LoginPage = () => {
     setError(null);
     try {
       const response = await authLogin(data);
-      console.log('######RESPONSE########################', response);
-      if (defaultCurrency) {
+
+      if (response.user.defaultCurrencyId) {
         navigate('/home');
       } else {
         navigate('/user-details');
