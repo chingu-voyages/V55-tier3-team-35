@@ -1,9 +1,4 @@
-import {
-  Home,
-  PiggyBank,
-  CircleDollarSign,
-  ArrowLeftRight,
-} from 'lucide-react';
+import { Home, CircleDollarSign, ArrowLeftRight } from 'lucide-react';
 
 import { cn } from '@/lib/utils';
 
@@ -22,13 +17,12 @@ const mobileNavItems: MobileNavItem[] = [
   { id: 'dashboard', label: 'Overview', icon: Home },
   { id: 'transactions', label: 'Transactions', icon: ArrowLeftRight },
   { id: 'budgets', label: 'Budgets', icon: CircleDollarSign },
-  { id: 'savings', label: 'Pots', icon: PiggyBank },
 ];
 
 const MobileNav: React.FC<MobileNavProps> = ({ activeTab, onTabChange }) => {
   return (
-    <div className="md:hidden fixed bottom-0 left-0 right-0 bg-Gray-900 rounded-t-lg border-t border-[#333333] z-50">
-      <div className="flex justify-around items-center pt-2">
+    <div className="md:hidden fixed bottom-0 left-0 right-0 bg-Gray-900 rounded-t-lg border-t border-[#333333] z-50  ">
+      <div className="flex justify-around items-center pt-2 ">
         {mobileNavItems.map((item) => (
           <button
             key={item.id}

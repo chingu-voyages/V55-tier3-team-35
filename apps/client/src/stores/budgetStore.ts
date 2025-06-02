@@ -1,38 +1,33 @@
 import { create } from 'zustand';
 
-import { get as apiGet, post, patch, del } from '../api/api';
-import type { Budget, BudgetFormData } from '../types/budget.types';
+import { post, patch, del, get as apiGet } from '../api/api';
+
+import type { Budget, BudgetFormData } from '@/types/budget.types';
 
 // Mock data for fallback
 const mockBudgets: Budget[] = [
   {
     id: '1',
-
     category: 'Entertainment',
     maximum: 50,
     spent: 15,
     remaining: 35,
-    period: 'monthly',
-    theme: 'Blue',
+    theme: 'Green',
   },
   {
     id: '2',
-
     category: 'Bills',
     maximum: 750,
     spent: 150,
     remaining: 600,
-    period: 'monthly',
     theme: 'Red',
   },
   {
     id: '3',
-
     category: 'Food',
     maximum: 75,
     spent: 133,
     remaining: -58,
-    period: 'monthly',
     theme: 'Green',
   },
   {
@@ -41,77 +36,118 @@ const mockBudgets: Budget[] = [
     maximum: 100,
     spent: 40,
     remaining: 60,
-    period: 'monthly',
-    theme: 'Purple',
+    theme: 'Yellow',
   },
 ];
 
 interface BudgetStore {
   budgets: Budget[];
-  isLoading: boolean;
   error: string | null;
-  addBudget: (budget: BudgetFormData) => Promise<void>;
-  fetchBudgets: () => Promise<void>;
+  addBudget: (budgetData: BudgetFormData) => Promise<void>;
   updateBudget: (id: string, updates: Partial<Budget>) => Promise<void>;
   deleteBudget: (id: string) => Promise<void>;
+  fetchBudgets: () => Promise<void>;
   clearError: () => void;
+  hasFetchedBudgets: boolean;
 }
 
-export const useBudgetStore = create<BudgetStore>((set) => {
-  const handleAsync = async (operation: () => Promise<void>) => {
-    set({ isLoading: true, error: null });
+export const useBudgetStore = create<BudgetStore>((set, get) => ({
+  budgets: [],
+  error: null,
+  hasFetchedBudgets: false,
+
+  clearError: () => set({ error: null }),
+
+  fetchBudgets: async () => {
+    if (get().hasFetchedBudgets) return;
+    set({ hasFetchedBudgets: true });
     try {
-      await operation();
-      set({ isLoading: false });
+      const budgets = await apiGet('/budgets');
+      set({ budgets: budgets.length ? budgets : mockBudgets });
     } catch (error) {
-      console.error('Budget Store Error:', error);
-      set({
-        error: error instanceof Error ? error.message : 'An error occurred',
-        isLoading: false,
-      });
+      console.error('Failed to fetch budgets:', error);
+      set({ budgets: mockBudgets });
     }
-  };
+  },
 
-  return {
-    budgets: [],
-    isLoading: false,
-    error: null,
+  addBudget: async (budgetData) => {
+    const tempId = `temp-${Date.now()}`;
+    const newBudget: Budget = {
+      ...budgetData,
+      id: tempId,
+      maximum: Number(budgetData.maximum),
+      spent: 0,
+      remaining: Number(budgetData.maximum),
+      theme: budgetData.theme || 'Green',
+    };
 
-    clearError: () => set({ error: null }),
+    set((state) => ({
+      budgets: [...state.budgets, newBudget],
+    }));
 
-    fetchBudgets: () =>
-      handleAsync(async () => {
-        try {
-          const budgets = await apiGet('/budgets');
-          set({ budgets });
-        } catch {
-          set({ budgets: mockBudgets });
-        }
-      }),
+    try {
+      const savedBudget = await post('/budgets', budgetData);
 
-    addBudget: (budgetData: BudgetFormData) =>
-      handleAsync(async () => {
-        const newBudget = await post('/budgets', {
-          ...budgetData,
-          maximum: parseFloat(budgetData.maximum),
-        });
-        set((state) => ({ budgets: [...state.budgets, newBudget] }));
-      }),
+      set((state) => ({
+        budgets: state.budgets.map((budget) =>
+          budget.id === tempId ? { ...budget, id: savedBudget.id } : budget,
+        ),
+      }));
+    } catch (error) {
+      console.error('Failed to add budget:', error);
+    }
+  },
 
-    updateBudget: (id: string, updates: Partial<Budget>) =>
-      handleAsync(async () => {
-        const updatedBudget = await patch(`/budgets/${id}`, updates);
-        set((state) => ({
-          budgets: state.budgets.map((b) => (b.id === id ? updatedBudget : b)),
-        }));
-      }),
+  updateBudget: async (id, updates) => {
+    const currentBudgets = get().budgets;
+    const budgetToUpdate = currentBudgets.find((b) => b.id === id);
 
-    deleteBudget: (id: string) =>
-      handleAsync(async () => {
-        await del(`/budgets/${id}`);
-        set((state) => ({
-          budgets: state.budgets.filter((b) => b.id !== id),
-        }));
-      }),
-  };
-});
+    if (!budgetToUpdate) return;
+
+    // Optimistic update
+    set((state) => ({
+      budgets: state.budgets.map((budget) =>
+        budget.id === id
+          ? {
+              ...budget,
+              ...updates,
+              maximum:
+                updates.maximum !== undefined
+                  ? Number(updates.maximum)
+                  : budget.maximum,
+              remaining:
+                updates.maximum !== undefined
+                  ? Number(updates.maximum) - budget.spent
+                  : budget.remaining,
+              theme: updates.theme !== undefined ? updates.theme : budget.theme,
+            }
+          : budget,
+      ),
+    }));
+
+    try {
+      await patch(`/budgets/${id}`, updates);
+    } catch (error) {
+      console.error('Failed to update budget:', error);
+    }
+  },
+
+  deleteBudget: async (id) => {
+    const currentBudgets = get().budgets;
+    const budgetToDelete = currentBudgets.find((b) => b.id === id);
+
+    if (!budgetToDelete) return;
+
+    // Optimistic update
+    set((state) => ({
+      budgets: state.budgets.filter((budget) => budget.id !== id),
+    }));
+
+    try {
+      // Background server request
+      await del(`/budgets/${id}`);
+    } catch (error) {
+      console.error('Failed to delete budget:', error);
+    }
+  },
+}));

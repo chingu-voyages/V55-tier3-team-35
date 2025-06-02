@@ -1,10 +1,18 @@
 import type { ThemeOption, CategoryOption } from '../types/budget.types';
 
 export const THEME_OPTIONS: ThemeOption[] = [
-  { value: 'green', label: 'Green', colorClass: 'bg-Green' },
-  { value: 'yellow', label: 'Yellow', colorClass: 'bg-Yellow' },
-  { value: 'cyan', label: 'Cyan', colorClass: 'bg-Cyan' },
-  { value: 'navy', label: 'Navy', colorClass: 'bg-Navy' },
+  { value: 'Green', label: 'Green', colorClass: 'bg-Green' },
+  { value: 'Yellow', label: 'Yellow', colorClass: 'bg-Yellow' },
+  { value: 'Cyan', label: 'Cyan', colorClass: 'bg-Cyan' },
+  { value: 'Navy', label: 'Navy', colorClass: 'bg-Navy' },
+  { value: 'Turquoise', label: 'Turquoise', colorClass: 'bg-Turquoise' },
+  { value: 'Brown', label: 'Brown', colorClass: 'bg-Brown' },
+  { value: 'Magenta', label: 'Magenta', colorClass: 'bg-Magenta' },
+  { value: 'Blue', label: 'Blue', colorClass: 'bg-Blue' },
+  { value: 'NavyGrey', label: 'Navy Grey', colorClass: 'bg-NavyGrey' },
+  { value: 'ArmyGreen', label: 'Army Green', colorClass: 'bg-ArmyGreen' },
+  { value: 'Gold', label: 'Gold', colorClass: 'bg-Gold' },
+  { value: 'Orange', label: 'Orange', colorClass: 'bg-Orange' },
 ];
 
 export const CATEGORY_OPTIONS: CategoryOption[] = [
@@ -14,6 +22,10 @@ export const CATEGORY_OPTIONS: CategoryOption[] = [
   { value: 'personal', label: 'Personal Care' },
   { value: 'shopping', label: 'Shopping' },
   { value: 'transportation', label: 'Transportation' },
+  { value: 'groceries', label: 'Groceries' },
+  { value: 'health', label: 'Health' },
+  { value: 'travel', label: 'Travel' },
+  { value: 'education', label: 'Education' },
 ];
 
 export const FORM_VALIDATION = {
