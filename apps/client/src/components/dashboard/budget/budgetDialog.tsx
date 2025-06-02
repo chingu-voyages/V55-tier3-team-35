@@ -12,6 +12,7 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 import { Form } from '@/components/ui/form';
+import { CATEGORY_OPTIONS } from '@/constants/budgetOptions';
 import { useBudgetStore } from '@/stores/budgetStore';
 import type { Budget, BudgetFormData } from '@/types/budget.types';
 
@@ -36,9 +37,13 @@ export const BudgetDialog: React.FC<BudgetDialogProps> = ({
   useEffect(() => {
     if (open) {
       if (isEdit && budget) {
+        const categoryValue =
+          CATEGORY_OPTIONS.find(
+            (opt) => opt.label.toLowerCase() === budget.category.toLowerCase(),
+          )?.value || budget.category.toLowerCase();
         form.reset({
-          category: budget.category,
-          maximum: budget.maximum.toString(),
+          category: categoryValue,
+          maximum: String(budget.maximum),
           theme: budget.theme,
         });
       } else {

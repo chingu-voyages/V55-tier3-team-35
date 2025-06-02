@@ -2,6 +2,7 @@ import { create } from 'zustand';
 
 import { post, patch, del, get as apiGet } from '../api/api';
 
+import { capitalize } from '@/lib/utils';
 import type { Budget, BudgetFormData } from '@/types/budget.types';
 
 // Mock data for fallback
@@ -75,6 +76,7 @@ export const useBudgetStore = create<BudgetStore>((set, get) => ({
     const newBudget: Budget = {
       ...budgetData,
       id: tempId,
+      category: capitalize(budgetData.category),
       maximum: Number(budgetData.maximum),
       spent: 0,
       remaining: Number(budgetData.maximum),
@@ -120,6 +122,10 @@ export const useBudgetStore = create<BudgetStore>((set, get) => ({
                   ? Number(updates.maximum) - budget.spent
                   : budget.remaining,
               theme: updates.theme !== undefined ? updates.theme : budget.theme,
+              category:
+                updates.category !== undefined
+                  ? capitalize(updates.category)
+                  : budget.category,
             }
           : budget,
       ),
