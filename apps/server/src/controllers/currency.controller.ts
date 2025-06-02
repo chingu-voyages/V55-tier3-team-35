@@ -1,10 +1,11 @@
-import type { Request, Response } from 'express';
+import type { NextFunction, Request, Response } from 'express';
 
 import { currencyService } from '../services/currency.service';
 
 export const listCurrencies = async (
   req: Request,
   res: Response,
+  next: NextFunction,
 ): Promise<void> => {
   try {
     const currencies = await currencyService.getAllCurrencies();
@@ -15,10 +16,6 @@ export const listCurrencies = async (
       .status(200)
       .json({ message: 'Currencies retrieved successfully', data: currencies });
   } catch (err) {
-    console.error('Error fetching currencies', err);
-    res.status(500).json({
-      message: 'Internal server error',
-      error: 'Failed to get currencies.',
-    });
+    next(err);
   }
 };

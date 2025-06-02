@@ -1,6 +1,6 @@
 import { Prisma } from '@prisma/client';
 import bcrypt from 'bcrypt';
-import type { Request, Response } from 'express';
+import type { NextFunction, Request, Response } from 'express';
 import jwt from 'jsonwebtoken';
 
 import { prisma } from '../database/db';
@@ -10,6 +10,7 @@ import { registerSchema } from '../schemas/registerSchema';
 export const registerUser = async (
   req: Request,
   res: Response,
+  next: NextFunction,
 ): Promise<void> => {
   try {
     const validationResult = registerSchema.safeParse(req.body);
@@ -96,11 +97,15 @@ export const registerUser = async (
       }
     }
     console.error('Unexpected error occurred', err);
-    res.status(500).json({ message: 'An unexpected error has occurred' });
+    next(err);
   }
 };
 
-export const logInUser = async (req: Request, res: Response): Promise<void> => {
+export const logInUser = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+): Promise<void> => {
   try {
     const { username, password } = req.body;
     // Input validation
@@ -160,9 +165,6 @@ export const logInUser = async (req: Request, res: Response): Promise<void> => {
       },
     });
   } catch (err) {
-    res.status(500).json({
-      message: 'An unexpected error has occurred',
-      error: err instanceof Error ? err.message : err,
-    });
+    next(err);
   }
 };

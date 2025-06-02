@@ -52,7 +52,7 @@ describe('Currency Controller', () => {
 
   it('should return a 500 error if the service failed', async () => {
     // Arrange
-    const errorMessage = 'Internal server error';
+    const errorMessage = 'Internal Server Error';
     (
       currencyService.getAllCurrencies as ReturnType<typeof vi.fn>
     ).mockRejectedValue(new Error(errorMessage));

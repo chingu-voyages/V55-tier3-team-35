@@ -79,6 +79,7 @@ describe('User controller', () => {
     expect(response.body.message).toBe('Invalid input');
     expect(userService.updateUserDetails).not.toHaveBeenCalled();
   });
+
   it('should handle service errors gracefully', async () => {
     const validUserData = {
       userId: 1,
@@ -87,15 +88,17 @@ describe('User controller', () => {
       defaultCurrencyId: 1,
     };
 
-    // Mock the service to throw an error
     const serviceError = new Error('Database connection failed');
     (
       userService.updateUserDetails as ReturnType<typeof vi.fn>
     ).mockRejectedValue(serviceError);
 
-    await request(app).patch(TEST_END_POINT).send(validUserData).expect(500); // Assuming your app has error handling middleware
+    const response = await request(app)
+      .patch(TEST_END_POINT)
+      .send(validUserData);
 
-    // Verify the service was called
+    expect(response.status).toBe(500);
+    expect(response.body.message).toBe('Internal Server Error');
     expect(userService.updateUserDetails).toHaveBeenCalledTimes(1);
     expect(userService.updateUserDetails).toHaveBeenCalledWith(validUserData);
   });
