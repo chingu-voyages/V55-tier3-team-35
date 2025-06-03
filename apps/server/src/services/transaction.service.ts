@@ -12,4 +12,12 @@ export const transactionService = {
       data: transactionData,
     });
   },
+
+  async getTransactions(id: number): Promise<Transaction[]> {
+    return await prisma.transactions.findMany({
+      where: {
+        user_id: id,
+      },
+    });
+  },
 };

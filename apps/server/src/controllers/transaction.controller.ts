@@ -2,9 +2,12 @@ import type { NextFunction, Request, Response } from 'express';
 
 import { env } from '../schemas/env';
 import { transactionService } from '../services/transaction.service';
-import { createTransactionSchema } from './../schemas/transactionSchema';
+import {
+  createTransactionSchema,
+  getTransactionsSchema,
+} from './../schemas/transactionSchema';
 
-export const createTransaction = async (
+const createTransaction = async (
   req: Request,
   res: Response,
   next: NextFunction,
@@ -35,3 +38,29 @@ export const createTransaction = async (
     next(err);
   }
 };
+
+const getTransactions = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
+  const { id } = req.params;
+  const validationResult = getTransactionsSchema.safeParse(req.params);
+  try {
+    if (!validationResult.success) {
+      res.status(400).json({
+        message: 'Invalid input',
+        error: validationResult.error.issues,
+      });
+      return;
+    }
+    const response = await transactionService.getTransactions(Number(id));
+    res
+      .status(200)
+      .json({ message: 'Transactions fetched successfully', data: response });
+  } catch (err) {
+    next(err);
+  }
+};
+
+export { createTransaction, getTransactions };

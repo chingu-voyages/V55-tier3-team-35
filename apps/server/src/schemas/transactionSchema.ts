@@ -12,6 +12,10 @@ export const transactionSchema = z.object({
   notes: z.string().nullable().optional(),
 });
 
+export const getTransactionsSchema = z.object({
+  id: z.coerce.number().positive(),
+});
+
 export const createTransactionSchema = transactionSchema.omit({ id: true });
 export type createTransactionInput = z.infer<typeof createTransactionSchema>;
 export type Transaction = z.infer<typeof transactionSchema>;
