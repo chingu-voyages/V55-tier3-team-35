@@ -20,6 +20,7 @@ import {
   THEME_OPTIONS,
   FORM_VALIDATION,
 } from '@/constants/budgetOptions';
+import { useBudgetStore } from '@/stores/budgetStore';
 import type { BudgetFormData } from '@/types/budget.types';
 
 interface BudgetFormFieldsProps {
@@ -31,6 +32,10 @@ export const BudgetFormFields: React.FC<BudgetFormFieldsProps> = ({
   control,
   isEdit = false,
 }) => {
+  const { budgets } = useBudgetStore();
+
+  const usedCategories = budgets.map((b) => b.category.toLowerCase());
+  const usedThemes = budgets.map((b) => b.theme);
   return (
     <>
       <FormField
@@ -43,19 +48,28 @@ export const BudgetFormFields: React.FC<BudgetFormFieldsProps> = ({
               Budget Category
             </FormLabel>
             <FormControl>
-              <Select
-                onValueChange={field.onChange}
-                value={field.value} // Use value instead of defaultValue for controlled component
-              >
+              <Select onValueChange={field.onChange} value={field.value}>
                 <SelectTrigger className="w-full border border-Gray-500 rounded-lg">
                   <SelectValue placeholder="e.g. Entertainment" />
                 </SelectTrigger>
                 <SelectContent className="bg-white border border-Gray-500">
-                  {CATEGORY_OPTIONS.map((option) => (
-                    <SelectItem key={option.value} value={option.value}>
-                      {option.label}
-                    </SelectItem>
-                  ))}
+                  {CATEGORY_OPTIONS.map((option) => {
+                    const isUsed =
+                      usedCategories.includes(option.value.toLowerCase()) &&
+                      option.value.toLowerCase() !== field.value.toLowerCase();
+                    return (
+                      <SelectItem
+                        key={option.value}
+                        value={option.value}
+                        disabled={isUsed}
+                        className={
+                          isUsed ? 'opacity-50 cursor-not-allowed' : ''
+                        }
+                      >
+                        {option.label}
+                      </SelectItem>
+                    );
+                  })}
                 </SelectContent>
               </Select>
             </FormControl>
@@ -105,24 +119,33 @@ export const BudgetFormFields: React.FC<BudgetFormFieldsProps> = ({
               Theme
             </FormLabel>
             <FormControl>
-              <Select
-                onValueChange={field.onChange}
-                value={field.value} // Use value for controlled component
-              >
+              <Select onValueChange={field.onChange} value={field.value}>
                 <SelectTrigger className="w-full border border-Gray-500 rounded-lg">
                   <SelectValue placeholder="Pick a theme" />
                 </SelectTrigger>
-                <SelectContent className="bg-white border border-Gray-500">
-                  {THEME_OPTIONS.map((option) => (
-                    <SelectItem key={option.value} value={option.value}>
-                      <div className="flex items-center gap-2">
-                        <div
-                          className={`w-4 h-4 rounded-full ${option.colorClass}`}
-                        />
-                        {option.label}
-                      </div>
-                    </SelectItem>
-                  ))}
+                <SelectContent>
+                  {THEME_OPTIONS.map((option) => {
+                    const isUsed =
+                      usedThemes.includes(option.value) &&
+                      option.value !== field.value;
+                    return (
+                      <SelectItem
+                        key={option.value}
+                        value={option.value}
+                        disabled={isUsed}
+                        className={
+                          isUsed ? 'opacity-50 cursor-not-allowed' : ''
+                        }
+                      >
+                        <div className="flex items-center gap-2">
+                          <span
+                            className={`w-4 h-4 rounded-full bg-${option.value}`}
+                          />
+                          {option.label}
+                        </div>
+                      </SelectItem>
+                    );
+                  })}
                 </SelectContent>
               </Select>
             </FormControl>

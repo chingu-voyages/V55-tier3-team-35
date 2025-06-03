@@ -80,22 +80,22 @@ export const BudgetDialog: React.FC<BudgetDialogProps> = ({
   return (
     <Dialog open={open} onOpenChange={handleDialogChange}>
       {trigger}
-      <DialogContent className="sm:max-w-md bg-white">
+      <DialogContent
+        aria-describedby="dialog-description"
+        className="sm:max-w-md bg-white"
+      >
         <DialogHeader>
           <DialogTitle className="text-xl font-bold text-Gray-900 mb-2">
             {isEdit ? `Edit "${budget?.category}" Budget` : 'Add New Budget'}
           </DialogTitle>
-          {!isEdit && (
-            <DialogDescription className="text-sm text-Gray-500 mb-2">
-              Create a new budget to track your spending in a specific category.
-            </DialogDescription>
-          )}
-          {isEdit && (
-            <div className="text-sm text-Gray-500 mb-4">
-              Make changes to your budget. Only update the fields you want to
-              change.
-            </div>
-          )}
+          <DialogDescription
+            id="dialog-description"
+            className="text-sm text-Gray-500 mb-4"
+          >
+            {isEdit
+              ? 'Make changes to your budget. Only update the fields you want to.'
+              : 'Create a new budget to track your spending in a specific category.'}
+          </DialogDescription>
         </DialogHeader>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
