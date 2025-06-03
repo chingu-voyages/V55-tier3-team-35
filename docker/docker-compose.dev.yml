@@ -1,5 +1,6 @@
 services:
   frontend:
+    image: fintrack/client:latest
     build:
       context: ..
       dockerfile: apps/client/dockerfile
@@ -12,6 +13,7 @@ services:
     working_dir: /app/apps/client
     command: bun run dev
   backend:
+    image: fintrack/server:latest
     build:
       context: ..
       dockerfile: apps/server/dockerfile

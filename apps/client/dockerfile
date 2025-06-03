@@ -19,6 +19,9 @@ CMD ["bun", "run", "dev"]
 # ============================
 FROM oven/bun:1.2.15-alpine AS builder 
 
+ARG VITE_API_BASE_URL
+ENV VITE_SERVER_HOST=${VITE_SERVER_HOST}
+
 WORKDIR /app
 COPY bun.lock ./
 
