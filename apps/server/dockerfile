@@ -1,0 +1,52 @@
+# ============================
+# Development Stage
+# ============================
+FROM oven/bun:1.2.15 AS dev
+
+WORKDIR /app
+COPY bun.lock ./
+
+RUN apt-get update -y && apt-get install -y openssl
+
+WORKDIR /app/apps/server
+COPY apps/server/package.json ./
+
+RUN bun install
+
+EXPOSE 3000
+
+CMD ["bun", "run", "dev"]
+
+# ============================
+# Production Stage
+# ============================
+FROM oven/bun:1.2.15-alpine AS prod
+ENV NODE_ENV=production
+
+WORKDIR /app
+COPY bun.lock ./
+
+RUN apk add --no-cache openssl
+
+RUN apk add --no-cache \
+    python3 \
+    make \
+    g++ \
+    && apk del python3 make g++
+
+RUN addgroup -g 1001 appgroup && \
+adduser -u 1001 -G appgroup -D v55-voyage-team-35
+
+COPY apps/server .
+RUN bun install
+RUN rm -rf /root/.bun/install
+RUN bun install --production && rm -rf /root/.bun/install/cache
+RUN bunx prisma generate
+
+RUN bun run build
+
+USER v55-voyage-team-35
+
+EXPOSE 3000
+
+CMD ["bun", "run", "start"]
