@@ -1,0 +1,50 @@
+# ============================
+# Development Stage
+# ============================
+FROM oven/bun:1.2.15 AS dev
+
+WORKDIR /app
+COPY bun.lock ./
+
+COPY apps/client/package.json ./
+
+RUN bun install
+
+EXPOSE 5173
+
+CMD ["bun", "run", "dev"]
+
+# ============================
+# Build Stage
+# ============================
+FROM oven/bun:1.2.15-alpine AS builder 
+
+WORKDIR /app
+COPY bun.lock ./
+
+COPY apps/client .
+RUN bun install
+RUN rm -rf /root/.bun/install
+RUN bun install --production && rm -rf /root/.bun/install/cache
+
+RUN bun run build
+
+# ============================
+# Production Stage
+# ============================
+FROM nginx:1.28-alpine AS prod
+COPY --from=builder /app/dist /usr/share/nginx/html
+
+RUN addgroup -g 1001 appgroup && \
+    adduser -u 1001 -G appgroup -D v55-voyage-team-35
+
+# Give permission to write to nginx directories to the new user
+RUN chown -R v55-voyage-team-35:appgroup /var/cache/nginx \
+    && chown -R v55-voyage-team-35:appgroup /var/log/nginx \
+    && chown -R v55-voyage-team-35:appgroup /etc/nginx/conf.d \
+    && touch /var/run/nginx.pid \
+    && chown -R v55-voyage-team-35:appgroup /var/run/nginx.pid
+USER v55-voyage-team-35
+
+EXPOSE 80
+CMD ["nginx", "-g", "daemon off;"]

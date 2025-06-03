@@ -12,6 +12,8 @@
     "@types/express": "^5.0.1",
     "@types/jsonwebtoken": "^9.0.9",
     "@types/lodash": "^4.17.16",
+    "@types/supertest": "^6.0.3",
+    "supertest": "^7.1.1",
     "vitest": "^3.1.4"
   },
   "peerDependencies": {
@@ -29,7 +31,6 @@
     "jsonwebtoken": "^9.0.2",
     "lodash": "^4.17.21",
     "prisma": "^6.8.2",
-    "supertest": "^7.1.1",
     "ts-node": "^10.9.2",
     "zod": "^3.25.8"
   },
@@ -37,6 +38,8 @@
     "lint": "eslint . --config ./eslint.config.js --fix",
     "format": "prettier --config ./.prettierrc --write .",
     "dev": "bun server.ts",
-    "test": "vitest"
+    "test": "vitest",
+    "build": "bun build server.ts --target=bun",
+    "start": "bun run server.ts"
   }
 }

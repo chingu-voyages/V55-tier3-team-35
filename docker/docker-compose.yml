@@ -1,0 +1,17 @@
+services:
+  backend:
+    image: fintrack/server:latest
+    build:
+      context: ..
+      dockerfile: apps/server/dockerfile
+    ports:
+      - "3000:3000"
+
+  frontend:
+    image: fintrack/client:latest
+    build:
+      context: ..
+      dockerfile: apps/client/dockerfile
+      target: prod
+    ports:
+      - "80:80"
