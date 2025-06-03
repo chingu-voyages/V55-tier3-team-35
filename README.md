@@ -57,7 +57,7 @@ bunx prisma generate     # Regenerates the Prisma client
 In the root of the project, run the following command to start the app in development mode:
 
 ```bash
-docker-compose -f docker/docker-compose.dev.yml up --build
+docker compose -f docker/docker-compose.dev.yml up --build
 ```
 
 This command will build the Docker containers and start the application in development mode.
@@ -72,13 +72,13 @@ This command will build the Docker containers and start the application in devel
 To stop the running containers, press `CTRL + C` in the terminal or run:
 
 ```bash
-docker-compose -f docker/docker-compose.dev.yml down
+docker compose -f docker/docker-compose.dev.yml down
 ```
 
 ### Rebuilding the Containers
 
 ```bash
-docker-compose -f docker/docker-compose.dev.yml up --build
+docker compose -f docker/docker-compose.dev.yml up --build
 ```
 
 ### Viewing Logs
@@ -86,7 +86,7 @@ docker-compose -f docker/docker-compose.dev.yml up --build
 To view the logs of a specific container, use:
 
 ```bash
-docker-compose -f docker/docker-compose.dev.yml logs -f [service-name]
+docker compose -f docker/docker-compose.dev.yml logs -f [service-name]
 ```
 
 Replace `[service-name]` with `backend` or `frontend` as applicable.

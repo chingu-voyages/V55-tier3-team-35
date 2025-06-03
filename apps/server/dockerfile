@@ -32,6 +32,7 @@ RUN apk add --no-cache \
     python3 \
     make \
     g++ \
+    && bun install bcrypt \
     && apk del python3 make g++
 
 RUN addgroup -g 1001 appgroup && \
