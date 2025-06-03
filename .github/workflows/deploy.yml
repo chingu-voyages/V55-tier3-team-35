@@ -106,12 +106,12 @@ jobs:
             --platform managed \
             --region us-central1 \
             --allow-unauthenticated \
-            --set-env-vars="DATABASE_URL=${{ secrets.DATABASE_URL }}, \
-            DIRECT_URL=${{ secrets.DIRECT_URL }}, \
-            JWT_SECRET=${{ secrets.JWT_SECRET }}, \
-            SUPABASE_ANON_KEY=${{ secrets.SUPABASE_ANON_KEY }}, \
-            SUPABASE_URL=${{ secrets.SUPABASE_URL }}, \
-            CLIENT_HOST=${ ALLOWED_ORIGINS }, \
+            --set-env-vars="DATABASE_URL=${{ secrets.DATABASE_URL }},\
+            DIRECT_URL=${{ secrets.DIRECT_URL }},\
+            JWT_SECRET=${{ secrets.JWT_SECRET }},\
+            SUPABASE_ANON_KEY=${{ secrets.SUPABASE_ANON_KEY }},\
+            SUPABASE_URL=${{ secrets.SUPABASE_URL }},\
+            CLIENT_HOST=${ALLOWED_ORIGINS},\
             NODE_ENV=${{ vars.NODE_ENV }}"
 
       - name: Get Server Url
