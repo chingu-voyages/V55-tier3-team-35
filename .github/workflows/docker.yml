@@ -1,0 +1,125 @@
+name: Build and Push Docker Images
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
+
+env:
+  BACKEND_IMAGE_NAME: hazelbestt/fintrack-backend
+  FRONTEND_IMAGE_NAME: hazelbestt/fintrack-frontend
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v3
+
+    - name: Log in to Docker Hub
+      uses: docker/login-action@v3
+      with:
+        username: ${{ secrets.DOCKER_USERNAME }}
+        password: ${{ secrets.DOCKER_PASSWORD }}
+
+    - name: Generate tags for backend
+      id: meta-backend
+      run: |
+        BRANCH_NAME=${GITHUB_REF#refs/heads/}
+        SHORT_SHA=${GITHUB_SHA:0:7}
+        
+        TAGS="${{ env.BACKEND_IMAGE_NAME }}:${BRANCH_NAME}-${SHORT_SHA}"
+        TAGS="${TAGS},${{ env.BACKEND_IMAGE_NAME }}:${BRANCH_NAME}"
+        
+        if [ "$BRANCH_NAME" = "main" ]; then
+          TAGS="${TAGS},${{ env.BACKEND_IMAGE_NAME }}:latest"
+        fi
+        
+        echo "tags=${TAGS}" >> $GITHUB_OUTPUT
+
+    - name: Generate tags for frontend
+      id: meta-frontend
+      run: |
+        BRANCH_NAME=${GITHUB_REF#refs/heads/}
+        SHORT_SHA=${GITHUB_SHA:0:7}
+        
+        TAGS="${{ env.FRONTEND_IMAGE_NAME }}:${BRANCH_NAME}-${SHORT_SHA}"
+        TAGS="${TAGS},${{ env.FRONTEND_IMAGE_NAME }}:${BRANCH_NAME}"
+        
+        if [ "$BRANCH_NAME" = "main" ]; then
+          TAGS="${TAGS},${{ env.FRONTEND_IMAGE_NAME }}:latest"
+        fi
+        
+        echo "tags=${TAGS}" >> $GITHUB_OUTPUT
+
+    - name: Build Docker Compose services
+      run: |
+        # Set dummy environment variables for build
+        export DATABASE_URL="postgresql://dummy:dummy@localhost:5432/dummy"
+        export DIRECT_URL="postgresql://dummy:dummy@localhost:5432/dummy"
+        
+        docker compose -f docker/docker-compose.yml build
+
+    - name: Tag and push backend image
+      run: |
+        BACKEND_IMAGE_ID=$(docker images -q fintrack/server:latest)
+        
+        if [ -z "$BACKEND_IMAGE_ID" ]; then
+          echo "Trying to find backend image by service name..."
+          BACKEND_IMAGE_ID=$(docker compose -f docker/docker-compose.yml images -q backend)
+        fi
+        
+        echo "Backend Image ID: $BACKEND_IMAGE_ID"
+        echo "Backend Tags: ${{ steps.meta-backend.outputs.tags }}"
+        
+        # Tag and push each tag for backend
+        IFS=',' read -ra TAGS <<< "${{ steps.meta-backend.outputs.tags }}"
+        for tag in "${TAGS[@]}"; do
+          if [ -n "$tag" ] && [ "$tag" != " " ]; then
+            echo "Tagging: $BACKEND_IMAGE_ID -> $tag"
+            docker tag "$BACKEND_IMAGE_ID" "$tag"
+            docker push "$tag"
+          fi
+        done
+
+    - name: Tag and push frontend image
+      run: |
+        # Try to get the frontend image - it should be fintrack/client:latest based on your compose
+        FRONTEND_IMAGE_ID=$(docker images -q fintrack/client:latest)
+        
+        if [ -z "$FRONTEND_IMAGE_ID" ]; then
+          echo "Trying to find frontend image by service name..."
+          FRONTEND_IMAGE_ID=$(docker compose -f docker/docker-compose.yml images -q frontend)
+        fi
+        
+        if [ -z "$FRONTEND_IMAGE_ID" ]; then
+          echo "Error: No frontend image found!"
+          echo "Available images:"
+          docker images
+          echo "Compose images:"
+          docker compose -f docker/docker-compose.yml images
+          exit 1
+        fi
+        
+        echo "Frontend Image ID: $FRONTEND_IMAGE_ID"
+        echo "Frontend Tags: ${{ steps.meta-frontend.outputs.tags }}"
+        
+        # Tag and push each tag for frontend
+        IFS=',' read -ra TAGS <<< "${{ steps.meta-frontend.outputs.tags }}"
+        for tag in "${TAGS[@]}"; do
+          if [ -n "$tag" ] && [ "$tag" != " " ]; then
+            echo "Tagging: $FRONTEND_IMAGE_ID -> $tag"
+            docker tag "$FRONTEND_IMAGE_ID" "$tag"
+            docker push "$tag"
+          fi
+        done
+
+    - name: Clean up local images
+      if: always()
+      run: |
+        docker system prune -f

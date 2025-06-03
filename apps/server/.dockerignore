@@ -7,4 +7,4 @@ __tests__
 coverage/
 *.log
 
-README.md
+.git
