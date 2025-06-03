@@ -16,7 +16,6 @@ vi.mock('../../src/middleware/auth.ts', () => {
     }),
   };
 });
-
 // eslint-disable-next-line import/order
 import createApp from '../../src/app/createApp';
 
