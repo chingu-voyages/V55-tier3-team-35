@@ -41,7 +41,7 @@ jobs:
     - name: Build Docker Compose services
       run: |
         if [ "${{ github.event_name }}" == "pull_request" ]; then
-          export VITE_API_URL="https://fintrack-backend-pr-${{ github.event.number }}-${{ GCP_PROJECT_ID }}.us-central1.run.app"
+          export VITE_API_URL="https://fintrack-backend-pr-${{ github.event.number }}-${{ env.GCP_PROJECT_ID }}.us-central1.run.app"
         else
           export VITE_API_URL="${{ env.PROD_CLIENT_URL }}"
         fi
