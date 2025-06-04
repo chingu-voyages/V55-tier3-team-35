@@ -1,6 +1,22 @@
 import request from 'supertest';
 import { vi, expect, describe, beforeEach, it } from 'vitest';
 
+vi.mock('../../src/middleware/auth.ts', () => {
+  return {
+    // This defines the default export of the mocked module
+    default: vi.fn((req, res, next) => {
+      // auth.ts uses `req.user`, so mock that property
+      req.user = {
+        userId: 123, // Match the type expected (e.g., number)
+        username: 'mockuser',
+        iat: Date.now() / 1000,
+        exp: Date.now() / 1000 + 3600, // Example expiration
+      };
+      next(); // Bypass the actual authentication logic
+    }),
+  };
+});
+
 vi.mock('../../src/services/user.service.ts', () => {
   return {
     userService: {
