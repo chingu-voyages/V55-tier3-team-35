@@ -44,12 +44,14 @@ export const BudgetDialog: React.FC<BudgetDialogProps> = ({
         form.reset({
           category: categoryValue,
           maximum: String(budget.maximum),
+          spending: '',
           theme: budget.theme,
         });
       } else {
         form.reset({
           category: '',
           maximum: '',
+          spending: '0',
           theme: '',
         });
       }
@@ -57,16 +59,20 @@ export const BudgetDialog: React.FC<BudgetDialogProps> = ({
   }, [isEdit, budget, open, form]);
 
   const onSubmit = async (data: BudgetFormData) => {
+    console.log('Form submission data:', data);
+
     if (isEdit && budget) {
       await updateBudget(budget.id, {
         category: data.category,
         maximum: Number(data.maximum),
+        spending: data.spending,
         theme: data.theme,
       });
     } else {
       await addBudget({
         category: data.category,
         maximum: data.maximum,
+        spending: data.spending || '0',
         theme: data.theme,
       });
     }

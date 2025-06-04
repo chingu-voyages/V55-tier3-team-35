@@ -36,6 +36,7 @@ export const BudgetFormFields: React.FC<BudgetFormFieldsProps> = ({
 
   const usedCategories = budgets.map((b) => b.category.toLowerCase());
   const usedThemes = budgets.map((b) => b.theme);
+
   return (
     <>
       <FormField
@@ -93,13 +94,41 @@ export const BudgetFormFields: React.FC<BudgetFormFieldsProps> = ({
                   $
                 </span>
                 <input
-                  {...field}
                   type="number"
                   step="0.01"
                   min="0.01"
                   placeholder={isEdit ? undefined : 'e.g. 2000'}
                   value={field.value || ''}
-                  onChange={(e) => field.onChange(e.target.value)}
+                  onChange={field.onChange}
+                  className="w-full pl-8 pr-4 py-2 border border-Gray-500 rounded-lg focus:outline-none focus:ring-2 focus:ring-Green"
+                />
+              </div>
+            </FormControl>
+            <FormMessage />
+          </FormItem>
+        )}
+      />
+
+      <FormField
+        control={control}
+        name="spending"
+        render={({ field }) => (
+          <FormItem>
+            <FormLabel className="text-sm font-medium text-Gray-500">
+              Add Spending
+            </FormLabel>
+            <FormControl>
+              <div className="relative">
+                <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-Gray-500">
+                  $
+                </span>
+                <input
+                  type="number"
+                  step="0.01"
+                  min="0.01"
+                  placeholder={isEdit ? 'e.g. 100' : '0'}
+                  value={field.value || ''}
+                  onChange={field.onChange}
                   className="w-full pl-8 pr-4 py-2 border border-Gray-500 rounded-lg focus:outline-none focus:ring-2 focus:ring-Green"
                 />
               </div>

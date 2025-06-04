@@ -2,6 +2,7 @@ export interface BudgetFormData {
   category: string;
   maximum: string;
   theme: string;
+  spending?: string;
 }
 
 export interface Budget {
@@ -9,7 +10,7 @@ export interface Budget {
   category: string;
   maximum: number;
   theme: string;
-  spent: number;
+  spending: number;
   remaining: number;
 }
 

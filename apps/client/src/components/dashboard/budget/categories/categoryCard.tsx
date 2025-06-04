@@ -1,8 +1,8 @@
 import { MoreHorizontal } from 'lucide-react';
 import { useState } from 'react';
 
-import DeleteBudgetDialog from './deleteBudgetDialog';
 import { BudgetDialog } from '../budgetDialog';
+import DeleteBudgetDialog from './deleteBudgetDialog';
 
 import { Button } from '@/components/ui/button';
 import {
@@ -14,8 +14,6 @@ import {
 import { Progress } from '@/components/ui/progress';
 import type { Budget } from '@/types/budget.types';
 
-// import EditBudgetDialog from './editBudgetDialog';
-
 interface CategoryCardProps {
   budget: Budget;
 }
@@ -24,7 +22,7 @@ const CategoryCard: React.FC<CategoryCardProps> = ({ budget }) => {
   const [isEditDialogOpen, setEditDialogOpen] = useState(false);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
 
-  const progress = (budget.spent / budget.maximum) * 100;
+  const progress = (budget.spending / budget.maximum) * 100;
 
   return (
     <>
@@ -73,7 +71,7 @@ const CategoryCard: React.FC<CategoryCardProps> = ({ budget }) => {
           <div>
             <div className="text-Gray-500">Spent</div>
             <div className="text-Gray-900 font-medium">
-              ${budget.spent.toFixed(2)}
+              ${budget.spending.toFixed(2)}
             </div>
           </div>
           <div className="text-right">

@@ -5,13 +5,12 @@ import { post, patch, del, get as apiGet } from '../api/api';
 import { capitalize } from '@/lib/utils';
 import type { Budget, BudgetFormData } from '@/types/budget.types';
 
-// Mock data for fallback
 const mockBudgets: Budget[] = [
   {
     id: '1',
     category: 'Entertainment',
     maximum: 50,
-    spent: 15,
+    spending: 15,
     remaining: 35,
     theme: 'Green',
   },
@@ -19,7 +18,7 @@ const mockBudgets: Budget[] = [
     id: '2',
     category: 'Bills',
     maximum: 750,
-    spent: 150,
+    spending: 150,
     remaining: 600,
     theme: 'Red',
   },
@@ -27,7 +26,7 @@ const mockBudgets: Budget[] = [
     id: '3',
     category: 'Food',
     maximum: 75,
-    spent: 133,
+    spending: 133,
     remaining: -58,
     theme: 'Green',
   },
@@ -35,7 +34,7 @@ const mockBudgets: Budget[] = [
     id: '4',
     category: 'Personal',
     maximum: 100,
-    spent: 40,
+    spending: 40,
     remaining: 60,
     theme: 'Yellow',
   },
@@ -45,7 +44,10 @@ interface BudgetStore {
   budgets: Budget[];
   error: string | null;
   addBudget: (budgetData: BudgetFormData) => Promise<void>;
-  updateBudget: (id: string, updates: Partial<Budget>) => Promise<void>;
+  updateBudget: (
+    id: string,
+    updates: Omit<Partial<Budget>, 'spending'> & { spending?: string },
+  ) => Promise<void>;
   deleteBudget: (id: string) => Promise<void>;
   fetchBudgets: () => Promise<void>;
   clearError: () => void;
@@ -73,14 +75,17 @@ export const useBudgetStore = create<BudgetStore>((set, get) => ({
 
   addBudget: async (budgetData) => {
     const tempId = `temp-${Date.now()}`;
+    const maximum = Number(budgetData.maximum);
+    const spending = Number(budgetData.spending) || 0;
+
     const newBudget: Budget = {
       ...budgetData,
       id: tempId,
       category: capitalize(budgetData.category),
-      maximum: Number(budgetData.maximum),
-      spent: 0,
-      remaining: Number(budgetData.maximum),
-      theme: budgetData.theme || 'Green',
+      maximum,
+      spending,
+      remaining: maximum - spending,
+      theme: budgetData.theme,
     };
 
     set((state) => ({
@@ -97,6 +102,7 @@ export const useBudgetStore = create<BudgetStore>((set, get) => ({
       }));
     } catch (error) {
       console.error('Failed to add budget:', error);
+      set({ error: 'Failed to add budget' });
     }
   },
 
@@ -106,21 +112,26 @@ export const useBudgetStore = create<BudgetStore>((set, get) => ({
 
     if (!budgetToUpdate) return;
 
-    // Optimistic update
+    const newSpending = updates.spending
+      ? (budgetToUpdate.spending || 0) + Number(updates.spending)
+      : budgetToUpdate.spending;
+
+    const newMaximum =
+      updates.maximum !== undefined
+        ? Number(updates.maximum)
+        : budgetToUpdate.maximum;
+
+    const newRemaining = newMaximum - newSpending;
+
     set((state) => ({
       budgets: state.budgets.map((budget) =>
         budget.id === id
           ? {
               ...budget,
               ...updates,
-              maximum:
-                updates.maximum !== undefined
-                  ? Number(updates.maximum)
-                  : budget.maximum,
-              remaining:
-                updates.maximum !== undefined
-                  ? Number(updates.maximum) - budget.spent
-                  : budget.remaining,
+              maximum: newMaximum,
+              spending: newSpending,
+              remaining: newRemaining,
               theme: updates.theme !== undefined ? updates.theme : budget.theme,
               category:
                 updates.category !== undefined
@@ -132,9 +143,13 @@ export const useBudgetStore = create<BudgetStore>((set, get) => ({
     }));
 
     try {
-      await patch(`/budgets/${id}`, updates);
+      await patch(`/budgets/${id}`, {
+        ...updates,
+        spending: updates.spending ? newSpending : undefined,
+      });
     } catch (error) {
       console.error('Failed to update budget:', error);
+      set({ error: 'Failed to update budget' });
     }
   },
 
@@ -144,16 +159,15 @@ export const useBudgetStore = create<BudgetStore>((set, get) => ({
 
     if (!budgetToDelete) return;
 
-    // Optimistic update
     set((state) => ({
       budgets: state.budgets.filter((budget) => budget.id !== id),
     }));
 
     try {
-      // Background server request
       await del(`/budgets/${id}`);
     } catch (error) {
       console.error('Failed to delete budget:', error);
+      set({ error: 'Failed to delete budget' });
     }
   },
 }));
