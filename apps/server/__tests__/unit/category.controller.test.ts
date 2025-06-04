@@ -1,8 +1,24 @@
 /* eslint-disable import/order */
 import request from 'supertest';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import createApp from '../../src/app/createApp';
 
+vi.mock('../../src/middleware/auth.ts', () => {
+  return {
+    // This defines the default export of the mocked module
+    default: vi.fn((req, res, next) => {
+      // auth.ts uses `req.user`, so mock that property
+      req.user = {
+        userId: 123, // Match the type expected (e.g., number)
+        username: 'mockuser',
+        iat: Date.now() / 1000,
+        exp: Date.now() / 1000 + 3600, // Example expiration
+      };
+      next(); // Bypass the actual authentication logic
+    }),
+  };
+});
+
+import createApp from '../../src/app/createApp';
 vi.mock('../../src/services/category.service.ts', () => {
   return {
     categoryService: {
@@ -12,9 +28,10 @@ vi.mock('../../src/services/category.service.ts', () => {
 });
 
 import { categoryService } from '../../src/services/category.service.ts';
+import requireAuth from '../../src/middleware/auth.ts';
 
 const app = createApp();
-const TEST_END_POINT = '/api/v1/categories';
+const TEST_END_POINT = '/api/v1/categories/user';
 
 describe('Category controller', () => {
   beforeEach(async () => {
@@ -42,10 +59,13 @@ describe('Category controller', () => {
       categoryService.getUserCategories as ReturnType<typeof vi.fn>
     ).mockReturnValue(mockCategories);
 
-    const response = await request(app).get(`${TEST_END_POINT}/${userId}`);
+    const response = await request(app)
+      .get(`${TEST_END_POINT}/${userId}`)
+      .set('Authorization', 'Bearer MOCKED_JWT_TOKEN');
 
     expect(response.status).toBe(200);
     expect(response.body.data).toStrictEqual(mockCategories);
     expect(categoryService.getUserCategories).toHaveBeenCalledWith(userId);
+    expect(requireAuth).toHaveBeenCalled();
   });
 });
