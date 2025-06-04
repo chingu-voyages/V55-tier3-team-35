@@ -1,8 +1,8 @@
 import { MoreHorizontal } from 'lucide-react';
 import { useState } from 'react';
 
-import { BudgetDialog } from '../budgetDialog';
 import DeleteBudgetDialog from './deleteBudgetDialog';
+import { BudgetDialog } from '../budgetDialog';
 
 import { Button } from '@/components/ui/button';
 import {
