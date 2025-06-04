@@ -2,7 +2,7 @@ import type { NextFunction, Request, Response } from 'express';
 
 import { categoryService } from '../services/category.service';
 
-export const getUserTransactions = async (
+export const getUserCategories = async (
   req: Request,
   res: Response,
   next: NextFunction,

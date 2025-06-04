@@ -1,9 +1,9 @@
 import { Router } from 'express';
 
-import { getUserTransactions } from '../controllers/category.controller';
+import { getUserCategories } from '../controllers/category.controller';
 
 const categoryRouter = Router();
 
-categoryRouter.get('/:id', getUserTransactions);
+categoryRouter.get('/user/:id', getUserCategories);
 
 export default categoryRouter;
