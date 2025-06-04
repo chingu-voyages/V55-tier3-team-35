@@ -1,15 +1,11 @@
-# server
+## Running the server locally
 
-To install dependencies:
+1. run `bun install` to install independencies
+2. run `bun run dev` to start the server
 
-```bash
-bun install
-```
+## Running Github Actions
 
-To run:
-
-```bash
-bun run index.ts
-```
-
-This project was created using `bun init` in bun v1.2.13. [Bun](https://bun.sh) is a fast all-in-one JavaScript runtime.
+1. install [act](https://nektosact.com/installation/index.html) and verify using `act --version`
+2. install [docker desktop] and verify using `docker --version`
+3. add `.env` to ./apps/server folder and populate secrets according to `.env.example`
+4. run `act` in ./apps/server

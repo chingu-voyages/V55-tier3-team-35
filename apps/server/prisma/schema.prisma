@@ -1,0 +1,89 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+model currencies {
+  code   String  @db.VarChar(3)
+  name   String  @db.VarChar(50)
+  symbol String  @db.VarChar(10)
+  id     Int     @id(map: "currencies_id_pkey") @default(autoincrement())
+  users  users[]
+}
+
+model users {
+  id                  Int                @id @unique @default(autoincrement())
+  username            String             @unique @db.VarChar(50)
+  password_hash       String             @db.VarChar(255)
+  created_at          DateTime?          @default(now()) @db.Timestamptz(6)
+  default_currency_id Int?
+  first_name          String?            @db.VarChar(200)
+  last_name           String?            @db.VarChar(200)
+  categories          categories[]
+  category_budgets    category_budgets[]
+  transactions        transactions[]
+  currencies          currencies?        @relation(fields: [default_currency_id], references: [id], onUpdate: NoAction, map: "fk_currency_id")
+}
+
+model categories {
+  id               Int                @id(map: "cartegories_pkey") @default(autoincrement())
+  name             String             @db.VarChar(100)
+  user_id          Int
+  is_active        Boolean?           @default(true)
+  created_at       DateTime           @default(now()) @db.Timestamp(6)
+  is_user_created  Boolean?
+  users            users              @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "fk_user")
+  category_budgets category_budgets[]
+  transactions     transactions[]
+}
+
+model category_templates {
+  id         Int      @id(map: "categorytemplates_pkey") @default(autoincrement())
+  name       String   @unique(map: "categorytemplates_name_key") @db.VarChar(100)
+  is_default Boolean? @default(true)
+  is_active  Boolean? @default(true)
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+model transactions {
+  id                  Int               @id @default(autoincrement())
+  name                String            @db.VarChar(200)
+  category_id         Int
+  amount              Decimal           @db.Decimal(12, 2)
+  user_id             Int
+  notes               String?           @db.VarChar(200)
+  created_at          DateTime?         @default(now()) @db.Timestamptz(6)
+  updated_at          DateTime?         @default(now()) @db.Timestamptz(6)
+  transaction_date    DateTime          @default(dbgenerated("CURRENT_DATE")) @db.Date
+  transaction_type_id Int
+  categories          categories        @relation(fields: [category_id], references: [id], onUpdate: NoAction, map: "fk_category")
+  transaction_types   transaction_types @relation(fields: [transaction_type_id], references: [id], onUpdate: NoAction, map: "fk_transaction_type_id")
+  users               users             @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "fk_user")
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+model category_budgets {
+  id            Int        @default(autoincrement())
+  user_id       Int
+  category_id   Int
+  year          Int
+  month         Int
+  budget_amount Decimal?   @db.Decimal(12, 2)
+  created_at    DateTime?  @default(now()) @db.Timestamp(6)
+  categories    categories @relation(fields: [category_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "fk_category_id")
+  users         users      @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "fk_user_id")
+
+  @@unique([user_id, category_id, year, month])
+  @@index([user_id, year, month], map: "idx_budgets_user_year_month")
+}
+
+model transaction_types {
+  id           Int            @id @default(autoincrement())
+  name         String         @unique @db.VarChar(100)
+  transactions transactions[]
+}

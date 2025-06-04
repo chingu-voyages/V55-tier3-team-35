@@ -1,22 +1,10 @@
 import { Router } from 'express';
 
-import {
-  getAllUsers,
-  updateUser,
-  createUser,
-  deleteUser,
-  getUserById,
-} from '../controllers/user.controller';
+import { updateUser, getUserById } from '../controllers/user.controller';
+import { asyncHandler } from './../middleware/asyncHandler';
 
 const userRouter = Router();
 
-userRouter
-  .route('/users')
-  .get(getAllUsers)
-  .post(createUser)
-  .put(updateUser)
-  .delete(deleteUser);
-
-userRouter.route('/users/:id').get(getUserById);
+userRouter.route('/me').patch(asyncHandler(updateUser)).get(getUserById);
 
 export default userRouter;

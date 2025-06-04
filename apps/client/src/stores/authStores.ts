@@ -1,17 +1,21 @@
 import { create } from 'zustand';
 
-import { post } from '../api/api';
+import { post, patch, get } from '../api/api';
 import {
   type AuthState,
   type AuthLoginData,
   type AuthRegisterData,
   type UserDetailsForm,
+  type Currency,
 } from './../types/stores.d';
 
-import { AUTH_ENDPOINTS } from '@/api/constants';
-import { type AxioError } from '@/types/stores.d';
+import {
+  AUTH_ENDPOINTS,
+  USER_ENDPOINTS,
+  CURRENCY_ENDPOINTS,
+} from '@/api/constants';
 
-export const useAuthStore = create<AuthState>((set) => ({
+export const useAuthStore = create<AuthState>()((set) => ({
   token: null,
   isLoading: false,
   isAuthenticated: false,
@@ -35,13 +39,6 @@ export const useAuthStore = create<AuthState>((set) => ({
       return response;
     } catch (error: unknown) {
       set({ isLoading: false, isAuthenticated: false });
-      if (error instanceof Error) {
-        const errorMessage =
-          (error as AxioError).response?.data?.message ||
-          error.message ||
-          'An unexpected error occurred.';
-        throw new Error(errorMessage);
-      }
       throw error;
     }
   },
@@ -61,45 +58,68 @@ export const useAuthStore = create<AuthState>((set) => ({
       set({
         token: response.token,
         isAuthenticated: true,
-        user: response.user,
+        user: {
+          id: response.data.id,
+          username: response.data.username,
+          defaultCurrencyId: response.data.default_currency_id,
+        },
         isLoading: false,
       });
     } catch (error: unknown) {
       set({ isLoading: false, isAuthenticated: false });
-      if (error instanceof Error) {
-        const errorMessage =
-          (error as AxioError).response?.data?.message ||
-          error.message ||
-          'An unexpected error occurred.';
-        throw new Error(errorMessage);
-      }
       throw error;
     }
   },
 
   checkAuth: async () => {
-    const token = localStorage.getItem('token');
-    if (token) {
-      set({ isAuthenticated: true });
-    }
+    set({ isAuthenticated: true });
   },
 
   saveUserDetails: async (data: UserDetailsForm) => {
     set({ isLoading: true });
     try {
-      //   const response = await post(AUTH_ENDPOINTS.USER_DETAILS, data, {});
-      console.log('######DATA########################', data);
-      set({ defaultCurrency: 'USD', isLoading: false });
-      return 'USD';
-    } catch (error: unknown) {
-      if (error instanceof Error) {
-        const errorMessage =
-          (error as AxioError).response?.data?.message ||
-          error.message ||
-          'An unexpected error occurred.';
-        throw new Error(errorMessage);
+      const currentState = useAuthStore.getState();
+
+      if (!currentState.user.id) {
+        throw new Error('User ID not found. Please log in again.');
       }
-      set({ isLoading: false, isAuthenticated: false });
+
+      // Fetch currencies from the API so that we can map the currency code to the currency id
+      const currenciesResponse = await get(CURRENCY_ENDPOINTS.LIST);
+      const currencies: Currency[] =
+        currenciesResponse.data || currenciesResponse;
+
+      // currency mapping
+      const selectedCurrency = currencies.find(
+        (currency) => currency.code === data.default_currency,
+      );
+
+      if (!selectedCurrency) {
+        throw new Error(`Currency ${data.default_currency} not found`);
+      }
+
+      const updateData = {
+        firstName: data.firstName,
+        lastName: data.lastName,
+        defaultCurrencyId: selectedCurrency.id,
+        userId: currentState.user.id,
+      };
+
+      await patch(USER_ENDPOINTS.UPDATE_USER, updateData);
+
+      set({
+        defaultCurrency: data.default_currency,
+        user: {
+          ...currentState.user,
+          firstName: data.firstName,
+          lastName: data.lastName,
+        },
+        isLoading: false,
+      });
+
+      return data.default_currency;
+    } catch (error: unknown) {
+      set({ isLoading: false });
       throw error;
     }
   },

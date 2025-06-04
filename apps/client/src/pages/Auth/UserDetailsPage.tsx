@@ -1,29 +1,49 @@
 import { Target, ChevronLeft } from 'lucide-react';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { useNavigate } from 'react-router-dom';
 
 import styles from '../Landing/LandingPage.module.css';
 
+import { get } from '@/api/api';
+import { CURRENCY_ENDPOINTS } from '@/api/constants';
 import { Button } from '@/components/ui/button';
 import { type UserDetailsForm } from '@/lib/schema';
 import { useAuthStore } from '@/stores/authStores';
-import { type AxioError } from '@/types/stores.d';
+import { type AxioError, type Currency } from '@/types/stores.d';
 
 const UserDetailsPage = () => {
   const [error, setError] = useState<string | null>(null);
+  const [currencies, setCurrencies] = useState<Currency[]>([]);
+  const [loadingCurrencies, setLoadingCurrencies] = useState(true);
   const { isLoading, saveUserDetails } = useAuthStore();
   const navigate = useNavigate();
 
   const { register, handleSubmit } = useForm<UserDetailsForm>();
 
+  useEffect(() => {
+    const fetchCurrencies = async () => {
+      try {
+        const response = await get(CURRENCY_ENDPOINTS.LIST);
+        const currencyData = response.data || response;
+        setCurrencies(currencyData);
+      } catch (error) {
+        console.error('Failed to fetch currencies:', error);
+        setError('Failed to load currencies. Please refresh the page.');
+      } finally {
+        setLoadingCurrencies(false);
+      }
+    };
+
+    fetchCurrencies();
+  }, []);
+
   const onSubmit = async (data: UserDetailsForm) => {
     try {
       setError(null);
       const response = await saveUserDetails(data);
-      console.log('######RESPONSE########################', response);
       if (response !== null) {
-        navigate('/Home');
+        navigate('/home');
       }
     } catch (error: unknown) {
       if (error instanceof Error) {
@@ -70,7 +90,7 @@ const UserDetailsPage = () => {
               className="space-y-4 md:space-y-6"
             >
               <div className="flex flex-col gap-1.5 md:gap-2">
-                <label htmlFor="username" className="text-sm text-gray-600">
+                <label htmlFor="firstName" className="text-sm text-gray-600">
                   First Name
                 </label>
                 <input
@@ -85,7 +105,7 @@ const UserDetailsPage = () => {
                 />
               </div>
               <div className="flex flex-col gap-1.5 md:gap-2">
-                <label htmlFor="username" className="text-sm text-gray-600">
+                <label htmlFor="lastName" className="text-sm text-gray-600">
                   Last Name
                 </label>
                 <input
@@ -114,30 +134,21 @@ const UserDetailsPage = () => {
                   focus:ring-2 focus:ring-indigo-500 focus:border-transparent
                   transition-all duration-200 placeholder:text-gray-400 
                   text-black"
+                  disabled={loadingCurrencies}
                 >
-                  <option value="USD">USD</option>
-                  <option value="EUR">EUR</option>
-                  <option value="GBP">GBP</option>
-                  <option value="INR">INR</option>
+                  {loadingCurrencies ? (
+                    <option value="">Loading currencies...</option>
+                  ) : (
+                    <>
+                      <option value="">Select a currency</option>
+                      {currencies.map((currency) => (
+                        <option key={currency.id} value={currency.code}>
+                          {currency.code} - {currency.name}
+                        </option>
+                      ))}
+                    </>
+                  )}
                 </select>
-              </div>
-              <div className="flex flex-col gap-1.5 md:gap-2">
-                <label
-                  htmlFor="default_currency"
-                  className="text-sm text-gray-600"
-                >
-                  Monthly Budget
-                </label>
-                <input
-                  type="number"
-                  id="monthly_budget"
-                  {...register('monthly_budget')}
-                  className="w-full p-2.5 md:p-3 border border-gray-300 rounded-md
-                  focus:ring-2 focus:ring-indigo-500 focus:border-transparent
-                  transition-all duration-200 placeholder:text-gray-400 
-                  text-black"
-                  placeholder="Enter your monthly budget"
-                />
               </div>
 
               {error && (
@@ -146,7 +157,7 @@ const UserDetailsPage = () => {
 
               <Button
                 type="submit"
-                disabled={isLoading}
+                disabled={isLoading || loadingCurrencies}
                 className="w-full py-2.5 md:py-3 mt-2 md:mt-4
                 bg-indigo-600 hover:bg-indigo-700 
                 text-white font-medium rounded-md

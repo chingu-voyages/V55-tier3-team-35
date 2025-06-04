@@ -33,13 +33,14 @@
   },
   "private": true,
   "scripts": {
-    "prepare": "husky"
+    "prepare": "husky",
+    "install:all": "bun install && bun install --cwd apps/client && bun install --cwd apps/server"
   },
   "workspaces": [
     "apps/*",
     "packages/*"
   ],
   "dependencies": {
-    "@radix-ui/react-select": "^2.2.5"
+    "supertest": "^7.1.1"
   }
 }

@@ -1,17 +1,18 @@
+import { Prisma } from '@prisma/client';
 import bcrypt from 'bcrypt';
-import type { Request, Response } from 'express';
+import type { NextFunction, Request, Response } from 'express';
 import jwt from 'jsonwebtoken';
 
-import { supabase } from '../database/db';
+import { prisma } from '../database/db';
 import { env } from '../schemas/env';
 import { registerSchema } from '../schemas/registerSchema';
 
 export const registerUser = async (
   req: Request,
   res: Response,
+  next: NextFunction,
 ): Promise<void> => {
   try {
-    // validate request body
     const validationResult = registerSchema.safeParse(req.body);
     if (!validationResult.success) {
       res.status(400).json({
@@ -23,13 +24,10 @@ export const registerUser = async (
 
     const { username, password } = validationResult.data;
 
-    // Supabase error handling is async and could fail silently (does not throw exceptions by default),
-    // so it's better to check for duplication explicitly instead of relying on database constraint errors only
-    const { data: existingUser } = await supabase
-      .from('users')
-      .select('id')
-      .eq('username', username)
-      .single();
+    const existingUser = await prisma.users.findUnique({
+      where: { username },
+      select: { id: true },
+    });
 
     if (existingUser) {
       res.status(409).json({ message: 'Username already taken.' });
@@ -38,65 +36,94 @@ export const registerUser = async (
 
     const saltRounds = 10;
     const password_hash = await bcrypt.hash(password, saltRounds); // hash the password saltRound number of times
-    const { data, error } = await supabase
-      .from('users')
-      .insert([{ username, password_hash }]) // data variable name must correspond to the table column name
-      .select('id, username, created_at, default_currency_code');
 
-    if (error) {
-      // check for unique constraint violation (Supabase error code for unique violation is '23505')
-      if (error.code === '23505') {
-        res
-          .status(409)
-          .json({ message: 'Username already taken.', error: error.message });
-        return;
-      }
-      console.log('Error creating user', error);
-      res.status(500).json({
-        message: 'Internal server error. Please try again later.',
-      });
+    const newUser = await prisma.users.create({
+      data: {
+        username,
+        password_hash,
+      },
+      select: {
+        id: true,
+        username: true,
+        created_at: true,
+        default_currency_id: true,
+      },
+    });
+    const templateCategories = await prisma.category_templates.findMany();
+    if (!templateCategories.length) {
+      throw new Error('No template categories found.');
     }
-    if (!data || data.length === 0) {
-      console.error(
-        'User creation returned no data, though no explicit error.',
+    const userCategoryData = templateCategories.map((template) => ({
+      name: template.name,
+      is_user_created: false,
+      user_id: newUser.id,
+    }));
+
+    const createdCategories = await prisma.categories.createMany({
+      data: userCategoryData,
+    });
+
+    if (createdCategories.count != templateCategories.length) {
+      console.warn(
+        `Expected to create ${templateCategories.length} categories, but only created ${createdCategories.count}`,
       );
-      res.status(500).json({ message: 'User created, but no data returned.' });
-      return;
     }
+
+    // Generate JWT token for the newly registered user
+    const token = jwt.sign(
+      {
+        userId: newUser.id,
+        username: newUser.username,
+      },
+      env.JWT_SECRET as string,
+      {
+        expiresIn: '48h',
+      },
+    );
 
     res.status(201).json({
       message: 'User registration successful!',
-      data: data[0],
+      token,
+      data: newUser,
     });
   } catch (err) {
-    console.error('Unexpected error occurred during user creation', err);
-    res.status(500).json({ message: 'An unexpected error has occurred' });
+    if (err instanceof Prisma.PrismaClientKnownRequestError) {
+      if (err.code === 'P2002') {
+        res.status(409).json({
+          message: 'Username already taken',
+          error: 'Unique constraint violation',
+        });
+        return;
+      }
+    }
+    console.error('Unexpected error occurred', err);
+    next(err);
   }
 };
 
-export const logInUser = async (req: Request, res: Response): Promise<void> => {
+export const logInUser = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+): Promise<void> => {
   try {
     const { username, password } = req.body;
-
-    // validate request body
+    // Input validation
     if (!username || !password) {
       res.status(400).json({ message: 'Username and password are required.' });
       return;
     }
 
-    const { data: user, error } = await supabase
-      .from('users')
-      .select('id, username, password_hash')
-      .eq('username', username)
-      .single();
-
-    if (error) {
-      console.error('Error fetching user', error);
-      res.status(500).json({
-        message: 'Internal server error. Please try again later.',
-      });
-      return;
-    }
+    // Look up user by username
+    const user = await prisma.users.findUnique({
+      where: { username },
+      select: {
+        id: true,
+        username: true,
+        password_hash: true,
+        default_currency_id: true,
+      },
+    });
 
     if (!user) {
       res.status(401).json({ message: 'Invalid username or password.' });
@@ -134,12 +161,20 @@ export const logInUser = async (req: Request, res: Response): Promise<void> => {
       user: {
         id: user.id,
         username: user.username,
+        defaultCurrencyId: user.default_currency_id,
       },
     });
   } catch (err) {
-    res.status(500).json({
-      message: 'An unexpected error has occurred',
-      error: err,
-    });
+    next(err);
   }
+};
+
+export const logOutUser = (req: Request, res: Response): void => {
+  res.clearCookie('token', {
+    httpOnly: true,
+    sameSite: 'strict',
+    secure: true,
+  });
+
+  res.status(302).redirect('/api/v1/auth/login');
 };

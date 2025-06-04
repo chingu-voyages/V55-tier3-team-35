@@ -1,46 +1,81 @@
-import type { Request, Response } from 'express';
+import type { NextFunction, Request, Response } from 'express';
 
-import { supabase } from '../database/db';
+import prisma from '../database/db';
+import { updateUserSchema } from '../schemas/updateUserSchema';
+import { userService } from '../services/user.service';
 
 export const createUser = (req: Request, res: Response): void => {
-  console.log('creating user ...');
   res.json({ message: 'This route will create a new user.' });
 };
 
 export const getAllUsers = async (
   req: Request,
   res: Response,
+  next: NextFunction,
 ): Promise<void> => {
   console.log('getting all users ...');
-  const { data, error } = await supabase.from('users').select('*');
-  if (error) {
-    console.error('Error fetcing users:', error);
-    res.status(500).json({ error: 'Fail to fetch users.' });
+  try {
+    const users = await prisma.users.findMany();
+    res.status(200).json(users);
     return;
+  } catch (err) {
+    next(err);
   }
-  res.status(200).json(data);
 };
 
 export const getUserById = async (
   req: Request,
   res: Response,
+  next: NextFunction,
 ): Promise<void> => {
-  const userId = req.params.id;
-  const { data, error } = await supabase
-    .from('users')
-    .select('*')
-    .eq('id', userId)
-    .single();
-  if (error) {
-    console.error(`Error fetching user with ID ${userId}`, error);
-    res.status(404).json({ error: 'User not found.' });
+  const userIdString = req.params.id;
+  if (!userIdString) {
+    res.status(400).json({ error: 'User ID is required' });
     return;
   }
-  res.status(200).json(data);
+  const userId = parseInt(userIdString, 10);
+  if (isNaN(userId)) {
+    res.status(400).json({ error: 'Invalid user ID format' });
+    return;
+  }
+
+  try {
+    const user = await prisma.users.findUnique({
+      where: {
+        id: userId,
+      },
+    });
+
+    if (!user) {
+      res.status(404).json({ error: 'User not found' });
+      return;
+    }
+    res.status(200).json(user);
+    return;
+  } catch (err) {
+    next(err);
+  }
 };
 
-export const updateUser = (req: Request, res: Response): void => {
-  res.json({ message: 'This route will update an existing user.' });
+export const updateUser = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
+  try {
+    const validationResult = updateUserSchema.safeParse(req.body);
+    if (!validationResult.success) {
+      res.status(400).json({
+        message: 'Invalid input',
+        error: validationResult.error.format(),
+      });
+      return;
+    }
+    await userService.updateUserDetails(validationResult.data);
+    res.status(200).json({ message: 'User profile updated successfully.' });
+  } catch (err) {
+    next(err);
+  }
 };
 
 export const deleteUser = (req: Request, res: Response): void => {
