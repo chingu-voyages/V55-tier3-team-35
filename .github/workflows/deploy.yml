@@ -168,7 +168,7 @@ jobs:
 
             const commentBody = `Fintrack Preview Deployment
             
-            **Frontend URL:** \${clientURL}
+            **Frontend URL:** ${clientURL}
             **Backend URL:** ${{ steps.get-server-url.outputs.SERVER_URL }}
             
             **Preview environment details:**
