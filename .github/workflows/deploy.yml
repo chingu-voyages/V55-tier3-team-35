@@ -166,15 +166,14 @@ jobs:
                 '--region', 'us-central1', '--format', 'value(status.url)']
             )).stdout.trim();
 
-            const commentBody = \`## Fintrack Preview Deployment
+            const commentBody = `Fintrack Preview Deployment
             
             **Frontend URL:** \${clientURL}
             **Backend URL:** ${{ steps.get-server-url.outputs.SERVER_URL }}
             
             **Preview environment details:**
             - Client Docker Image: \`${{ env.FRONTEND_IMAGE_NAME }}:${{ env.IMAGE_TAG }}\`
-            - Server Docker Image: \`${{ env.BACKEND_IMAGE_NAME }}:${{ env.IMAGE_TAG }}\`
-            \`;
+            - Server Docker Image: \`${{ env.BACKEND_IMAGE_NAME }}:${{ env.IMAGE_TAG }}\``;
             
             await github.rest.issues.createComment({
               owner: context.repo.owner,
