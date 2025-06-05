@@ -11,8 +11,6 @@ import {
 } from './../schemas/transactionSchema';
 
 const createTransaction = async (
-
-const createTransaction = async (
   req: Request,
   res: Response,
   next: NextFunction,
