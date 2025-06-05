@@ -8,16 +8,20 @@ export const transactionService = {
   async createTransaction(
     transactionData: createTransactionInput,
   ): Promise<Transaction> {
-    return await prisma.transactions.create({
+    return prisma.transactions.create({
       data: transactionData,
     });
   },
 
   async getTransactions(id: number): Promise<Transaction[]> {
-    return await prisma.transactions.findMany({
+    return prisma.transactions.findMany({
       where: {
         user_id: id,
       },
+      orderBy: [
+        { created_at: 'desc' },
+        { id: 'desc' }, // fallback if timestamps are equal
+      ],
     });
   },
 };
