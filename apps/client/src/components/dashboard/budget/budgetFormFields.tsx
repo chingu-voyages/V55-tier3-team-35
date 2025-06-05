@@ -125,7 +125,7 @@ export const BudgetFormFields: React.FC<BudgetFormFieldsProps> = ({
                 <input
                   type="number"
                   step="0.01"
-                  min="0.01"
+                  min="0"
                   placeholder={isEdit ? 'e.g. 100' : '0'}
                   value={field.value || ''}
                   onChange={field.onChange}

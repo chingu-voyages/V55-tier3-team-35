@@ -1,6 +1,5 @@
 import {
   Home,
-  PiggyBank,
   CircleDollarSign,
   ArrowLeftRight,
   ArrowLeft,
@@ -27,7 +26,6 @@ const sidebarItems: SidebarItem[] = [
   { id: 'dashboard', label: 'Overview', icon: Home },
   { id: 'transactions', label: 'Transactions', icon: ArrowLeftRight },
   { id: 'budgets', label: 'Budgets', icon: CircleDollarSign },
-  { id: 'savings', label: 'Pots', icon: PiggyBank },
 ];
 
 const Sidebar: React.FC<SidebarProps> = ({

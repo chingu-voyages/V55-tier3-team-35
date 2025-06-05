@@ -5,7 +5,7 @@ import LoginPage from './pages/Auth/LoginPage';
 import RegisterPage from './pages/Auth/RegisterPage';
 import UserDetailsPage from './pages/Auth/UserDetailsPage';
 import HomePage from './pages/home/HomePage';
-import LandingPage from './pages/Landing/LandingPage';
+// import LandingPage from './pages/Landing/LandingPage';
 import { useAuthStore } from './stores/authStores';
 
 function App() {
@@ -18,7 +18,8 @@ function App() {
   return (
     <Routes>
       {/* Public routes - always accessible */}
-      <Route path="/" element={<LandingPage />} />
+      {/* <Route path="/" element={<LandingPage />} /> */}
+      <Route path="/" element={<HomePage />} />
       <Route path="/login" element={<LoginPage />} />
       <Route path="/register" element={<RegisterPage />} />
 

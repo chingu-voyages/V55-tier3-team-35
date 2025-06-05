@@ -4,7 +4,6 @@ import MobileNav from '@/components/dashboard/mobileNav';
 import Sidebar from '@/components/dashboard/sidebar';
 import BudgetsTab from '@/components/dashboard/tabs/budgetsTab';
 import DashboardTab from '@/components/dashboard/tabs/dashboardTab';
-import SavingsTab from '@/components/dashboard/tabs/savingsTab';
 import TransactionsTab from '@/components/dashboard/tabs/transactionsTab';
 
 const HomePage: React.FC = () => {
@@ -27,8 +26,7 @@ const HomePage: React.FC = () => {
         return <TransactionsTab />;
       case 'budgets':
         return <BudgetsTab />;
-      case 'savings':
-        return <SavingsTab />;
+
       default:
         return <div className="p-6">Content for {activeTab} tab</div>;
     }

@@ -40,8 +40,17 @@ const mockBudgets: Budget[] = [
   },
 ];
 
+const calculateTotals = (budgets: Budget[]) => ({
+  totalSpending: budgets.reduce((sum, b) => sum + b.spending, 0),
+  totalMaximum: budgets.reduce((sum, b) => sum + b.maximum, 0),
+  totalRemaining: budgets.reduce((sum, b) => sum + b.remaining, 0),
+});
+
 interface BudgetStore {
   budgets: Budget[];
+  totalSpending: number;
+  totalMaximum: number;
+  totalRemaining: number;
   error: string | null;
   addBudget: (budgetData: BudgetFormData) => Promise<void>;
   updateBudget: (
@@ -56,6 +65,9 @@ interface BudgetStore {
 
 export const useBudgetStore = create<BudgetStore>((set, get) => ({
   budgets: [],
+  totalSpending: 0,
+  totalMaximum: 0,
+  totalRemaining: 0,
   error: null,
   hasFetchedBudgets: false,
 
@@ -66,10 +78,17 @@ export const useBudgetStore = create<BudgetStore>((set, get) => ({
     set({ hasFetchedBudgets: true });
     try {
       const budgets = await apiGet('/budgets');
-      set({ budgets: budgets.length ? budgets : mockBudgets });
+      const finalBudgets = budgets.length ? budgets : mockBudgets;
+      set({
+        budgets: finalBudgets,
+        ...calculateTotals(finalBudgets),
+      });
     } catch (error) {
       console.error('Failed to fetch budgets:', error);
-      set({ budgets: mockBudgets });
+      set({
+        budgets: mockBudgets,
+        ...calculateTotals(mockBudgets),
+      });
     }
   },
 
@@ -88,9 +107,12 @@ export const useBudgetStore = create<BudgetStore>((set, get) => ({
       theme: budgetData.theme,
     };
 
-    set((state) => ({
-      budgets: [...state.budgets, newBudget],
-    }));
+    const newBudgets = [...get().budgets, newBudget];
+
+    set({
+      budgets: newBudgets,
+      ...calculateTotals(newBudgets),
+    });
 
     try {
       const savedBudget = await post('/budgets', budgetData);
@@ -123,24 +145,26 @@ export const useBudgetStore = create<BudgetStore>((set, get) => ({
 
     const newRemaining = newMaximum - newSpending;
 
-    set((state) => ({
-      budgets: state.budgets.map((budget) =>
-        budget.id === id
-          ? {
-              ...budget,
-              ...updates,
-              maximum: newMaximum,
-              spending: newSpending,
-              remaining: newRemaining,
-              theme: updates.theme !== undefined ? updates.theme : budget.theme,
-              category:
-                updates.category !== undefined
-                  ? capitalize(updates.category)
-                  : budget.category,
-            }
-          : budget,
-      ),
-    }));
+    const updatedBudgets = currentBudgets.map((budget) =>
+      budget.id === id
+        ? {
+            ...budget,
+            ...updates,
+            maximum: newMaximum,
+            spending: newSpending,
+            remaining: newRemaining,
+            theme: updates.theme !== undefined ? updates.theme : budget.theme,
+            category:
+              updates.category !== undefined
+                ? capitalize(updates.category)
+                : budget.category,
+          }
+        : budget,
+    );
+    set({
+      budgets: updatedBudgets,
+      ...calculateTotals(updatedBudgets),
+    });
 
     try {
       await patch(`/budgets/${id}`, {
@@ -159,9 +183,12 @@ export const useBudgetStore = create<BudgetStore>((set, get) => ({
 
     if (!budgetToDelete) return;
 
-    set((state) => ({
-      budgets: state.budgets.filter((budget) => budget.id !== id),
-    }));
+    const updatedBudgets = currentBudgets.filter((budget) => budget.id !== id);
+
+    set({
+      budgets: updatedBudgets,
+      ...calculateTotals(updatedBudgets),
+    });
 
     try {
       await del(`/budgets/${id}`);
