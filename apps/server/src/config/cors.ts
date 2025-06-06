@@ -6,7 +6,7 @@ export const corsOptions = {
     process.env.CLIENT_HOST === 'ALLOW_ALL' ||
     !process.env.CLIENT_HOST
       ? true
-      : [process.env.CLIENT_HOST].filter((host): host is string =>
+      : [process.env.ALLOWED_ORIGIN].filter((host): host is string =>
           Boolean(host),
         ),
   credentials: true,
