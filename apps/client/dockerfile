@@ -24,7 +24,7 @@ ENV VITE_API_BASE_URL=${VITE_API_BASE_URL}
 
 WORKDIR /app
 COPY bun.lock ./
-
+RUN echo "VITE_API_BASE_URL in Docker: $VITE_API_BASE_URL"
 COPY apps/client .
 RUN bun install
 RUN rm -rf /root/.bun/install
