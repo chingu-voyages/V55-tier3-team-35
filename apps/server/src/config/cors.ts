@@ -2,7 +2,7 @@ import { env } from '../schemas/env';
 
 export const corsOptions = {
   origin:
-    env.NODE_ENV !== 'production'
+    env.NODE_ENV !== 'production' || !process.env.CLIENT_HOST
       ? true
       : [process.env.CLIENT_HOST].filter((host): host is string =>
           Boolean(host),
