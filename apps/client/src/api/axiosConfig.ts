@@ -2,9 +2,10 @@
 import axios, { type AxiosResponse, type AxiosError } from 'axios';
 
 const API = axios.create({
-  baseURL: import.meta.env.VITE_API_BASE_URL
-    ? `${import.meta.env.VITE_API_BASE_URL}/api/v1`
-    : 'http://localhost:3000/api/v1',
+  // baseURL: import.meta.env.VITE_API_BASE_URL
+  //   ? `${import.meta.env.VITE_API_BASE_URL}/api/v1`
+  //   : 'http://localhost:3000/api/v1',
+  baseURL: 'https://fintrack-backend-pr-28-svdds2hpyq-uc.a.run.app/api/v1',
   headers: {
     'Content-Type': 'application/json',
   },
