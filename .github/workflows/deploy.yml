@@ -52,7 +52,7 @@ jobs:
     - name: Tag and push backend image
       run: |
         IMAGE_TAG=${{ steps.get-image-tag.outputs.image-tag }}
-        BACKEND_IMAGE_ID=$(docker images -q fintrack/backend:latest)
+        BACKEND_IMAGE_ID=$(docker images -q fintrack/server:latest)
         docker tag "$BACKEND_IMAGE_ID" "${{ env.BACKEND_IMAGE_NAME }}:$IMAGE_TAG"
         docker push "${{ env.BACKEND_IMAGE_NAME }}:$IMAGE_TAG"
 
@@ -137,7 +137,7 @@ jobs:
     - name: Tag and push frontend image
       run: |
         IMAGE_TAG=${{ needs.build-and-deploy-backend.outputs.image-tag }}
-        FRONTEND_IMAGE_ID=$(docker images -q fintrack/frontend:latest)
+        FRONTEND_IMAGE_ID=$(docker images -q fintrack/client:latest)
         docker tag "$FRONTEND_IMAGE_ID" "${{ env.FRONTEND_IMAGE_NAME }}:$IMAGE_TAG"
         docker push "${{ env.FRONTEND_IMAGE_NAME }}:$IMAGE_TAG"
 
