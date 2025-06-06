@@ -25,6 +25,8 @@ Install [Bun](https://bun.sh/docs/installation) on your local machine.
 
 ### 2. Clone the repo
 
+#### Using GitHub CLI
+
 ```bash
 git clone gh repo clone chingu-voyages/V55-tier3-team-35
 cd V55-tier3-team-35
@@ -103,4 +105,4 @@ coding!
 - Steffi Saint-Pierre #3: [GitHub](https://github.com/stefley1509) / [LinkedIn](https://www.linkedin.com/in/steffisp/)
 - Shaimaa #4: [GitHub](https://github.com/Shaimaa01) / [LinkedIn](https://www.linkedin.com/in/shaimaa-kamel-818bab31b/)
 - Jack Li #5: [GitHub](https://github.com/jackli921) / [LinkedIn](https://www.linkedin.com/in/jackli0707/)
-- Kuro #7: [GitHub](https://github.com/kayoMichael) / [LinkedIn](https://www.linkedin.com/in/michael-li-72115222b/)
+- Michael #6: [GitHub](https://github.com/kayoMichael) / [LinkedIn](https://www.linkedin.com/in/michael-li-72115222b/)
