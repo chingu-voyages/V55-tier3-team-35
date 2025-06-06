@@ -3,12 +3,12 @@ name: Server tests
 on:
   push:
     paths:
-      - "/apps/server/**"
+      - "apps/server/**"
       - ".github/workflows/server-tests.yml"
   pull_request:
     branches: [main, development]
     paths:
-      - "/apps/server/**"
+      - "apps/server/**"
       - ".github/workflows/server-tests.yml"
 jobs:
   test-server:
