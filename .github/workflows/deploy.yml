@@ -47,12 +47,12 @@ jobs:
       run: |
         export DATABASE_URL="${{ secrets.DATABASE_URL }}"
         export DIRECT_URL="${{ secrets.DIRECT_URL }}"
-        docker compose -f docker/docker-compose.yml build server
+        docker compose -f docker/docker-compose.yml build backend
 
     - name: Tag and push backend image
       run: |
         IMAGE_TAG=${{ steps.get-image-tag.outputs.image-tag }}
-        BACKEND_IMAGE_ID=$(docker images -q fintrack/server:latest)
+        BACKEND_IMAGE_ID=$(docker images -q fintrack/backend:latest)
         docker tag "$BACKEND_IMAGE_ID" "${{ env.BACKEND_IMAGE_NAME }}:$IMAGE_TAG"
         docker push "${{ env.BACKEND_IMAGE_NAME }}:$IMAGE_TAG"
 
@@ -132,12 +132,12 @@ jobs:
         else
           export VITE_API_BASE_URL="https://api.fin-track.live"
         fi
-        docker compose -f docker/docker-compose.yml build client
+        docker compose -f docker/docker-compose.yml build frontend
 
     - name: Tag and push frontend image
       run: |
         IMAGE_TAG=${{ needs.build-and-deploy-backend.outputs.image-tag }}
-        FRONTEND_IMAGE_ID=$(docker images -q fintrack/client:latest)
+        FRONTEND_IMAGE_ID=$(docker images -q fintrack/frontend:latest)
         docker tag "$FRONTEND_IMAGE_ID" "${{ env.FRONTEND_IMAGE_NAME }}:$IMAGE_TAG"
         docker push "${{ env.FRONTEND_IMAGE_NAME }}:$IMAGE_TAG"
 
