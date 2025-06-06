@@ -10,13 +10,15 @@ env:
   BACKEND_IMAGE_NAME: hazelbestt/fintrack-backend
   FRONTEND_IMAGE_NAME: hazelbestt/fintrack-frontend
   GCP_PROJECT_ID: fintrack-461818
-  PROD_CLIENT_URL: placeholder
-
+  PROD_CLIENT_URL: https://fin-track.live
 
 jobs:
-  build-and-push:
+  build-and-deploy-backend:
     runs-on: ubuntu-latest
     if: "!startsWith(github.ref_name, 'skip') && !startsWith(github.ref_name, 'docs') && !startsWith(github.ref_name, 'wip')"
+    outputs:
+      backend-url: ${{ steps.get-backend-url.outputs.backend-url }}
+      image-tag: ${{ steps.get-image-tag.outputs.image-tag }}
     
     steps:
     - name: Checkout repository
@@ -32,153 +34,187 @@ jobs:
         password: ${{ secrets.DOCKER_PASSWORD }}
 
     - name: Get image tag
+      id: get-image-tag
       run: |
         if [ "${{ github.event_name }}" == "pull_request" ]; then
           PR_NUMBER=${{ github.event.number }}
-          echo "IMAGE_TAG=pr-$PR_NUMBER" >> $GITHUB_ENV
+          echo "image-tag=pr-$PR_NUMBER" >> $GITHUB_OUTPUT
         else
-          echo "IMAGE_TAG=latest" >> $GITHUB_ENV
+          echo "image-tag=latest" >> $GITHUB_OUTPUT
         fi
 
-    - name: Build Docker Compose services
+    - name: Build backend Docker image
       run: |
-        if [ "${{ github.event_name }}" == "pull_request" ]; then
-          export VITE_API_URL="https://fintrack-backend-pr-${{ github.event.number }}-${{ env.GCP_PROJECT_ID }}.us-central1.run.app"
-        else
-          export VITE_API_URL="${{ env.PROD_CLIENT_URL }}"
-        fi
-        export DATABASE_URL="${{ env.DATABASE_URL }}"
-        export DIRECT_URL="${{ env.DIRECT_URL }}"
-        docker compose -f docker/docker-compose.yml build
+        export DATABASE_URL="${{ secrets.DATABASE_URL }}"
+        export DIRECT_URL="${{ secrets.DIRECT_URL }}"
+        docker compose -f docker/docker-compose.yml build server
 
     - name: Tag and push backend image
       run: |
+        IMAGE_TAG=${{ steps.get-image-tag.outputs.image-tag }}
         BACKEND_IMAGE_ID=$(docker images -q fintrack/server:latest)
         docker tag "$BACKEND_IMAGE_ID" "${{ env.BACKEND_IMAGE_NAME }}:$IMAGE_TAG"
         docker push "${{ env.BACKEND_IMAGE_NAME }}:$IMAGE_TAG"
 
-    - name: Tag and push frontend image
+    - name: Authenticate to Google Cloud
+      uses: google-github-actions/auth@v2
+      with:
+        credentials_json: ${{ secrets.GCP_SA_KEY }}
+        project_id: ${{ env.GCP_PROJECT_ID }}
+
+    - name: Set up Cloud SDK
+      uses: google-github-actions/setup-gcloud@v2
+
+    - name: Get backend service name
       run: |
-        FRONTEND_IMAGE_ID=$(docker images -q fintrack/client:latest)
-        docker tag "$FRONTEND_IMAGE_ID" "${{ env.FRONTEND_IMAGE_NAME }}:$IMAGE_TAG"
-        docker push "${{ env.FRONTEND_IMAGE_NAME }}:$IMAGE_TAG"
+        if [ "${{ github.event_name }}" == "pull_request" ]; then
+          PR_NUMBER=${{ github.event.number }}
+          echo "BACKEND_SERVICE=fintrack-backend-pr-$PR_NUMBER" >> $GITHUB_ENV
+        else
+          echo "BACKEND_SERVICE=fintrack-backend" >> $GITHUB_ENV
+        fi
+
+    - name: Deploy backend to Cloud Run
+      run: |
+        IMAGE_TAG=${{ steps.get-image-tag.outputs.image-tag }}
+        if [[ ${{ github.event_name }} == 'pull_request' ]]; then
+          ALLOWED_ORIGINS="run.app"
+        else
+          ALLOWED_ORIGINS="${{ env.PROD_CLIENT_URL }}"
+        fi
+        
+        gcloud run deploy $BACKEND_SERVICE \
+          --image ${{ env.BACKEND_IMAGE_NAME }}:$IMAGE_TAG \
+          --platform managed \
+          --region us-central1 \
+          --allow-unauthenticated \
+          --set-env-vars="DATABASE_URL=${{ secrets.DATABASE_URL }},\
+          DIRECT_URL=${{ secrets.DIRECT_URL }},\
+          JWT_SECRET=${{ secrets.JWT_SECRET }},\
+          SUPABASE_ANON_KEY=${{ secrets.SUPABASE_ANON_KEY }},\
+          SUPABASE_URL=${{ secrets.SUPABASE_URL }},\
+          CLIENT_HOST=${ALLOWED_ORIGINS},\
+          NODE_ENV=${{ vars.NODE_ENV }}"
+
+    - name: Get backend URL
+      id: get-backend-url
+      run: |
+        BACKEND_URL=$(gcloud run services describe $BACKEND_SERVICE \
+          --region us-central1 \
+          --format 'value(status.url)')
+        echo "backend-url=$BACKEND_URL" >> $GITHUB_OUTPUT
 
     - name: Clean up local images
       if: always()
       run: |
         docker system prune -f
-      
-  deploy-to-gcr:
+
+  build-and-deploy-frontend:
     runs-on: ubuntu-latest
-    needs: build-and-push
+    needs: build-and-deploy-backend
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-        
-      - name: Authenticate to Google Cloud
-        uses: google-github-actions/auth@v2
-        with:
-          credentials_json: ${{ secrets.GCP_SA_KEY }}
-          project_id: ${{ env.GCP_PROJECT_ID }}
+    - name: Checkout repository
+      uses: actions/checkout@v4
 
-      - name: Set up Cloud SDK
-        uses: google-github-actions/setup-gcloud@v2
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v3
+
+    - name: Log in to Docker Hub
+      uses: docker/login-action@v3
+      with:
+        username: ${{ secrets.DOCKER_USERNAME }}
+        password: ${{ secrets.DOCKER_PASSWORD }}
+
+    - name: Build frontend Docker image
+      run: |
+        if [ "${{ github.event_name }}" == "pull_request" ]; then
+          export VITE_API_BASE_URL="${{ needs.build-and-deploy-backend.outputs.backend-url }}"
+        else
+          export VITE_API_BASE_URL="https://api.fin-track.live"
+        fi
+        docker compose -f docker/docker-compose.yml build client
+
+    - name: Tag and push frontend image
+      run: |
+        IMAGE_TAG=${{ needs.build-and-deploy-backend.outputs.image-tag }}
+        FRONTEND_IMAGE_ID=$(docker images -q fintrack/client:latest)
+        docker tag "$FRONTEND_IMAGE_ID" "${{ env.FRONTEND_IMAGE_NAME }}:$IMAGE_TAG"
+        docker push "${{ env.FRONTEND_IMAGE_NAME }}:$IMAGE_TAG"
+
+    - name: Authenticate to Google Cloud
+      uses: google-github-actions/auth@v2
+      with:
+        credentials_json: ${{ secrets.GCP_SA_KEY }}
+        project_id: ${{ env.GCP_PROJECT_ID }}
+
+    - name: Set up Cloud SDK
+      uses: google-github-actions/setup-gcloud@v2
+
+    - name: Get frontend service name
+      run: |
+        if [ "${{ github.event_name }}" == "pull_request" ]; then
+          PR_NUMBER=${{ github.event.number }}
+          echo "FRONTEND_SERVICE=fintrack-frontend-pr-$PR_NUMBER" >> $GITHUB_ENV
+        else
+          echo "FRONTEND_SERVICE=fintrack-frontend" >> $GITHUB_ENV
+        fi
+
+    - name: Deploy frontend to Cloud Run
+      run: |
+        IMAGE_TAG=${{ needs.build-and-deploy-backend.outputs.image-tag }}
+        gcloud run deploy $FRONTEND_SERVICE \
+          --image ${{ env.FRONTEND_IMAGE_NAME }}:$IMAGE_TAG \
+          --platform managed \
+          --region us-central1 \
+          --allow-unauthenticated \
+          --set-env-vars="NODE_ENV=${{ vars.NODE_ENV }}" \
+          --port=80
+
+    - name: Get Preview URLs and Comment on PR
+      if: github.event_name == 'pull_request'
+      uses: actions/github-script@v7
+      with:
+        script: |
+          const comments = await github.rest.issues.listComments({
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            issue_number: context.issue.number,
+          });
           
-      - name: Get image tag and service names
-        run: |
-          if [ "${{ github.event_name }}" == "pull_request" ]; then
-            PR_NUMBER=${{ github.event.number }}
-            echo "IMAGE_TAG=pr-$PR_NUMBER" >> $GITHUB_ENV
-            echo "BACKEND_SERVICE=fintrack-backend-pr-$PR_NUMBER" >> $GITHUB_ENV
-            echo "FRONTEND_SERVICE=fintrack-frontend-pr-$PR_NUMBER" >> $GITHUB_ENV
-          else
-            echo "IMAGE_TAG=latest" >> $GITHUB_ENV
-            echo "BACKEND_SERVICE=fintrack-backend" >> $GITHUB_ENV  
-            echo "FRONTEND_SERVICE=fintrack-frontend" >> $GITHUB_ENV
-          fi
-          
-      - name: Deploy Server to Cloud Run
-        run: |
-          if [[ ${{ github.event_name }} == 'pull_request' ]]; then
-            ALLOWED_ORIGINS="run.app"
-          else
-            ALLOWED_ORIGINS="${{ env.PROD_CLIENT_URL }}"
-          fi
-          
-          gcloud run deploy $BACKEND_SERVICE \
-            --image ${{ env.BACKEND_IMAGE_NAME }}:$IMAGE_TAG \
-            --platform managed \
-            --region us-central1 \
-            --allow-unauthenticated \
-            --set-env-vars="DATABASE_URL=${{ secrets.DATABASE_URL }},\
-            DIRECT_URL=${{ secrets.DIRECT_URL }},\
-            JWT_SECRET=${{ secrets.JWT_SECRET }},\
-            SUPABASE_ANON_KEY=${{ secrets.SUPABASE_ANON_KEY }},\
-            SUPABASE_URL=${{ secrets.SUPABASE_URL }},\
-            CLIENT_HOST=${ALLOWED_ORIGINS},\
-            NODE_ENV=${{ vars.NODE_ENV }}"
-
-      - name: Get Server Url
-        id: get-server-url
-        run: |
-          if [[ ${{ github.event_name }} == 'pull_request' ]]; then
-            SERVER_URL=$(gcloud run services describe $BACKEND_SERVICE \
-              --region us-central1 \
-              --format 'value(status.url)')
-            echo "SERVER_URL=$SERVER_URL" >> $GITHUB_OUTPUT
-          fi
-
-      - name: Deploy Client to Cloud Run
-        run: |
-          gcloud run deploy $FRONTEND_SERVICE \
-            --image ${{ env.FRONTEND_IMAGE_NAME }}:$IMAGE_TAG \
-            --platform managed \
-            --region us-central1 \
-            --allow-unauthenticated \
-            --set-env-vars="NODE_ENV=${{ vars.NODE_ENV }}" \
-            --port=80
-
-      - name: Get Preview URL
-        if: github.event_name == 'pull_request'
-        uses: actions/github-script@v7
-        with:
-          script: |
-            const comments = await github.rest.issues.listComments({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              issue_number: context.issue.number,
-            });
-            
-            for (const comment of comments.data) {
-              if (comment.body.includes('Fintrack Preview Deployment')) {
-                await github.rest.issues.deleteComment({
-                  owner: context.repo.owner,
-                  repo: context.repo.repo,
-                  comment_id: comment.id
-                });
-                break;
-              }
+          for (const comment of comments.data) {
+            if (comment.body.includes('Fintrack Preview Deployment')) {
+              await github.rest.issues.deleteComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                comment_id: comment.id
+              });
+              break;
             }
-            
-            const clientURL = (await exec.getExecOutput(
-              'gcloud',
-              ['run', 'services', 'describe', '${{ env.FRONTEND_SERVICE }}', 
-                '--region', 'us-central1', '--format', 'value(status.url)']
-            )).stdout.trim();
+          }
+          
+          const clientURL = (await exec.getExecOutput(
+            'gcloud',
+            ['run', 'services', 'describe', '${{ env.FRONTEND_SERVICE }}', 
+              '--region', 'us-central1', '--format', 'value(status.url)']
+          )).stdout.trim();
 
-            const commentBody = `Fintrack Preview Deployment
-            
-            **Frontend URL:** ${clientURL}
-            **Backend URL:** ${{ steps.get-server-url.outputs.SERVER_URL }}
-            
-            **Preview environment details:**
-            - Client Docker Image: \`${{ env.FRONTEND_IMAGE_NAME }}:${{ env.IMAGE_TAG }}\`
-            - Server Docker Image: \`${{ env.BACKEND_IMAGE_NAME }}:${{ env.IMAGE_TAG }}\``;
-            
-            await github.rest.issues.createComment({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              issue_number: context.issue.number,
-              body: commentBody
-            });
-                  
+          const commentBody = `Fintrack Preview Deployment
+          
+          **Frontend URL:** ${clientURL}
+          **Backend URL:** ${{ needs.build-and-deploy-backend.outputs.backend-url }}
+          
+          **Preview environment details:**
+          - Client Docker Image: \`${{ env.FRONTEND_IMAGE_NAME }}:${{ needs.build-and-deploy-backend.outputs.image-tag }}\`
+          - Server Docker Image: \`${{ env.BACKEND_IMAGE_NAME }}:${{ needs.build-and-deploy-backend.outputs.image-tag }}\``;
+          
+          await github.rest.issues.createComment({
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            issue_number: context.issue.number,
+            body: commentBody
+          });
+
+    - name: Clean up local images
+      if: always()
+      run: |
+        docker system prune -f
