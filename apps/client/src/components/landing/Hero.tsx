@@ -28,7 +28,7 @@ const Hero = () => {
           <p className="text-xl text-white/80 mb-8 max-w-2xl">
             The student-friendly finance tracker that makes expense tracking and
             budget projection easy, intuitive, and visually engaging with a
-            cosmic twist.
+            cosmic twist. Hello World + 1.
           </p>
 
           <div className="flex flex-col sm:flex-row gap-4 mb-16">
