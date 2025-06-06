@@ -4,7 +4,7 @@ export const corsOptions = {
   origin:
     env.NODE_ENV !== 'production'
       ? true
-      : [process.env.ALLOWED_ORIGIN].filter((host): host is string =>
+      : [process.env.CLIENT_HOST].filter((host): host is string =>
           Boolean(host),
         ),
   credentials: true,
