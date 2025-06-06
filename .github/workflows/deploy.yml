@@ -11,6 +11,7 @@ env:
   FRONTEND_IMAGE_NAME: hazelbestt/fintrack-frontend
   GCP_PROJECT_ID: fintrack-461818
   PROD_CLIENT_URL: https://fin-track.live
+  PROD_SERVER_URL: https://api.fin-track.live
 
 jobs:
   build-and-deploy-backend:
@@ -130,7 +131,7 @@ jobs:
         if [ "${{ github.event_name }}" == "pull_request" ]; then
           export VITE_API_BASE_URL="${{ needs.build-and-deploy-backend.outputs.backend-url }}"
         else
-          export VITE_API_BASE_URL="https://api.fin-track.live"
+          export VITE_API_BASE_URL=${{ env.PROD_SERVER_URL }}
         fi
         docker compose -f docker/docker-compose.yml build frontend
 
