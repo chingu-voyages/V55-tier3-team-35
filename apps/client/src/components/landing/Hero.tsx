@@ -17,7 +17,7 @@ const Hero = () => {
         <div className="flex flex-col items-center text-center max-w-4xl mx-auto">
           <div className="inline-flex items-center justify-center px-3 py-1 mb-8 nebula-pill">
             <CreditCard className="w-4 h-4 mr-2" />
-            <span>Smart financial tracking for students123</span>
+            <span>Smart financial tracking for students</span>
           </div>
 
           <h1 className="text-4xl md:text-6xl font-bold tracking-tight mb-6 glow-text text-white">
@@ -28,7 +28,7 @@ const Hero = () => {
           <p className="text-xl text-white/80 mb-8 max-w-2xl">
             The student-friendly finance tracker that makes expense tracking and
             budget projection easy, intuitive, and visually engaging with a
-            cosmic twist. Hello World + 1.
+            cosmic twist.
           </p>
 
           <div className="flex flex-col sm:flex-row gap-4 mb-16">
