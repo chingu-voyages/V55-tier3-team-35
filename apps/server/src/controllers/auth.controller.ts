@@ -13,6 +13,7 @@ export const registerUser = async (
   next: NextFunction,
 ): Promise<void> => {
   try {
+    console.log('calling register');
     const validationResult = registerSchema.safeParse(req.body);
     if (!validationResult.success) {
       res.status(400).json({
@@ -23,7 +24,6 @@ export const registerUser = async (
     }
 
     const { username, password } = validationResult.data;
-
     const existingUser = await prisma.users.findUnique({
       where: { username },
       select: { id: true },
