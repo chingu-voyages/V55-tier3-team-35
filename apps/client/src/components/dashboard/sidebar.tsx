@@ -4,7 +4,9 @@ import {
   ArrowLeftRight,
   ArrowLeft,
   ArrowRight,
+  LogOut,
 } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
@@ -34,6 +36,7 @@ const Sidebar: React.FC<SidebarProps> = ({
   isCollapsed,
   onToggle,
 }) => {
+  const navigate = useNavigate();
   return (
     <div
       className={cn(
@@ -75,11 +78,20 @@ const Sidebar: React.FC<SidebarProps> = ({
       <div className="p-4">
         <Button
           variant="ghost"
-          className="w-full justify-center text-Gray-300 hover:text-white hover:bg-[#333333]"
+          className="w-full justify-start text-Gray-300 hover:text-Red hover:bg-[#333333] mb-2 "
+          onClick={() => navigate('/')}
+        >
+          <LogOut className={cn('w-5 h-5', isCollapsed ? 'mx-auto' : 'mr-3')} />
+          {!isCollapsed && <span>Logout</span>}
+        </Button>
+
+        <Button
+          variant="ghost"
+          className="w-full justify-start text-Gray-300 hover:text-white hover:bg-[#333333]"
           onClick={onToggle}
         >
           {isCollapsed ? (
-            <ArrowRight className="w-5 h-5" />
+            <ArrowRight className="w-5 h-5 mx-auto" />
           ) : (
             <>
               <ArrowLeft className="w-5 h-5 mr-3" />
