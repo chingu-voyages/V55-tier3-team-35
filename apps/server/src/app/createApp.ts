@@ -7,6 +7,7 @@ import { corsOptions } from '../config/cors';
 import requireAuth from '../middleware/auth';
 import { errorHandler } from '../middleware/globalErrorHandler';
 import authRouter from '../routes/auth.routes';
+import budgetRouter from '../routes/budget.routes';
 import categoryRouter from '../routes/category.routes';
 import currencyRouter from '../routes/currency.routes';
 import transactionRouter from '../routes/transaction.routes';
@@ -24,6 +25,7 @@ export default function createApp(): Express {
   app.use('/api/v1/currencies', currencyRouter);
   app.use('/api/v1/transactions', requireAuth, transactionRouter);
   app.use('/api/v1/categories', requireAuth, categoryRouter);
+  app.use('/api/v1/budgets', budgetRouter);
   app.get('/', (_, res) => {
     res.json({ message: 'Hello World' });
   });
