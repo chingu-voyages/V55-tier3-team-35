@@ -1,0 +1,20 @@
+services:
+  frontend:
+    image: fintrack/client:latest
+    build:
+      context: ..
+      dockerfile: apps/client/dockerfile
+      target: prod
+      args:
+        VITE_API_BASE_URL: ${VITE_API_BASE_URL}
+    ports:
+      - "80:80"
+  backend:
+    image: fintrack/server:latest
+    build:
+      context: ..
+      dockerfile: apps/server/dockerfile
+    env_file: 
+      - ../apps/server/.env
+    ports:
+      - "3000:3000"

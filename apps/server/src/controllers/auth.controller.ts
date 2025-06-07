@@ -23,7 +23,6 @@ export const registerUser = async (
     }
 
     const { username, password } = validationResult.data;
-
     const existingUser = await prisma.users.findUnique({
       where: { username },
       select: { id: true },

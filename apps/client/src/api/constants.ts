@@ -1,7 +1,5 @@
 // src/api/constants.ts
 
-export const BASE_URL = 'http://localhost:3000';
-
 interface AuthEndpoints {
   LOGIN: string;
   REGISTER: string;
