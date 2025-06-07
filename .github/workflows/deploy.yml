@@ -48,7 +48,7 @@ jobs:
       run: |
         export DATABASE_URL="${{ secrets.DATABASE_URL }}"
         export DIRECT_URL="${{ secrets.DIRECT_URL }}"
-        docker compose -f docker/docker-compose.yml build backend
+        docker compose -f docker/docker-compose.yml build --no-cache backend
 
     - name: Tag and push backend image
       run: |
@@ -133,7 +133,7 @@ jobs:
         else
           export VITE_API_BASE_URL=${{ env.PROD_SERVER_URL }}
         fi
-        docker compose -f docker/docker-compose.yml build frontend
+        docker compose -f docker/docker-compose.yml build --no-cache frontend
 
     - name: Tag and push frontend image
       run: |
