@@ -18,7 +18,7 @@ export default function createApp(): Express {
   app.use(cookieParser());
   app.use(express.json());
   app.use(cors(corsOptions));
-  app.set('trust proxy', true);
+  app.set('trust proxy', 1);
   app.use('/api/v1/user', requireAuth, userRouter);
   app.use('/api/v1/auth', authRouter);
   app.use('/api/v1/currencies', currencyRouter);
