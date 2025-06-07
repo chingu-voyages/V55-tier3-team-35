@@ -24,7 +24,7 @@ const teamMembers = [
     github: 'https://github.com/jackli921',
   },
   {
-    name: 'Kuro',
+    name: 'Michael',
     github: 'https://github.com/kayoMichael',
   },
 ];
