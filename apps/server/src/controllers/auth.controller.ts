@@ -13,7 +13,6 @@ export const registerUser = async (
   next: NextFunction,
 ): Promise<void> => {
   try {
-    console.log('calling register');
     const validationResult = registerSchema.safeParse(req.body);
     if (!validationResult.success) {
       res.status(400).json({
