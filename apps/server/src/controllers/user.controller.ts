@@ -4,7 +4,7 @@ import prisma from '../database/db';
 import { updateUserSchema } from '../schemas/updateUserSchema';
 import { userService } from '../services/user.service';
 
-export const createUser = (_: Request, res: Response): void => {
+export const createUser = (req: Request, res: Response): void => {
   res.json({ message: 'This route will create a new user.' });
 };
 
