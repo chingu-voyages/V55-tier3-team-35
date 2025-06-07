@@ -18,10 +18,7 @@ export const transactionService = {
       where: {
         user_id: id,
       },
-      orderBy: [
-        { created_at: 'desc' },
-        { id: 'desc' }, // fallback if timestamps are equal
-      ],
+      orderBy: [{ created_at: 'desc' }],
     });
   },
 };
