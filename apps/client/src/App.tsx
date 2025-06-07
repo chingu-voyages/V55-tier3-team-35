@@ -19,6 +19,7 @@ function App() {
     <Routes>
       {/* Public routes - always accessible */}
       <Route path="/" element={<LandingPage />} />
+      {/* <Route path="/" element={<HomePage />} /> */}
       <Route path="/login" element={<LoginPage />} />
       <Route path="/register" element={<RegisterPage />} />
 
