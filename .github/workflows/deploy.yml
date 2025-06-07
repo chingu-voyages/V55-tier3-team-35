@@ -78,7 +78,7 @@ jobs:
     - name: Deploy backend to Cloud Run
       run: |
         IMAGE_TAG=${{ steps.get-image-tag.outputs.image-tag }}
-        if [[ ${{ github.event_name }} != 'pull_request' ]]; then
+        if [[ ${{ github.event_name }} == 'pull_request' ]]; then
           ALLOWED_ORIGINS="ALLOW_ALL"
         else
           ALLOWED_ORIGINS="${{ env.PROD_CLIENT_URL }}"
