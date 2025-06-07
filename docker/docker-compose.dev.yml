@@ -1,8 +1,10 @@
 services:
   frontend:
+    image: fintrack/client:latest
     build:
       context: ..
-      dockerfile: apps/client/dockerfile.dev
+      dockerfile: apps/client/dockerfile
+      target: dev
     ports:
       - "5173:5173"
     volumes:
@@ -11,9 +13,11 @@ services:
     working_dir: /app/apps/client
     command: bun run dev
   backend:
+    image: fintrack/server:latest
     build:
       context: ..
-      dockerfile: apps/server/dockerfile.dev
+      dockerfile: apps/server/dockerfile
+      target: dev
     ports:
       - "3000:3000"
     volumes:

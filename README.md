@@ -25,6 +25,8 @@ Install [Bun](https://bun.sh/docs/installation) on your local machine.
 
 ### 2. Clone the repo
 
+#### Using GitHub CLI
+
 ```bash
 git clone gh repo clone chingu-voyages/V55-tier3-team-35
 cd V55-tier3-team-35
@@ -57,7 +59,7 @@ bunx prisma generate     # Regenerates the Prisma client
 In the root of the project, run the following command to start the app in development mode:
 
 ```bash
-docker-compose -f docker/docker-compose.dev.yml up --build
+docker compose -f docker/docker-compose.dev.yml up --build
 ```
 
 This command will build the Docker containers and start the application in development mode.
@@ -72,13 +74,13 @@ This command will build the Docker containers and start the application in devel
 To stop the running containers, press `CTRL + C` in the terminal or run:
 
 ```bash
-docker-compose -f docker/docker-compose.dev.yml down
+docker compose -f docker/docker-compose.dev.yml down
 ```
 
 ### Rebuilding the Containers
 
 ```bash
-docker-compose -f docker/docker-compose.dev.yml up --build
+docker compose -f docker/docker-compose.dev.yml up --build
 ```
 
 ### Viewing Logs
@@ -86,7 +88,7 @@ docker-compose -f docker/docker-compose.dev.yml up --build
 To view the logs of a specific container, use:
 
 ```bash
-docker-compose -f docker/docker-compose.dev.yml logs -f [service-name]
+docker compose -f docker/docker-compose.dev.yml logs -f [service-name]
 ```
 
 Replace `[service-name]` with `backend` or `frontend` as applicable.
@@ -103,4 +105,4 @@ coding!
 - Steffi Saint-Pierre #3: [GitHub](https://github.com/stefley1509) / [LinkedIn](https://www.linkedin.com/in/steffisp/)
 - Shaimaa #4: [GitHub](https://github.com/Shaimaa01) / [LinkedIn](https://www.linkedin.com/in/shaimaa-kamel-818bab31b/)
 - Jack Li #5: [GitHub](https://github.com/jackli921) / [LinkedIn](https://www.linkedin.com/in/jackli0707/)
-- Kuro #7: [GitHub](https://github.com/kayoMichael) / [LinkedIn](https://www.linkedin.com/in/michael-li-72115222b/)
+- Michael #6: [GitHub](https://github.com/kayoMichael) / [LinkedIn](https://www.linkedin.com/in/michael-li-72115222b/)
