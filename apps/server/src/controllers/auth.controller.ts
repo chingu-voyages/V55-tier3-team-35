@@ -1,7 +1,7 @@
 import { Prisma } from '@prisma/client';
 import bcrypt from 'bcrypt';
 import type { NextFunction, Request, Response } from 'express';
-import jwt from 'jsonwebtoken';
+import jwt, { type JwtPayload } from 'jsonwebtoken';
 
 import { prisma } from '../database/db';
 import { env } from '../schemas/env';
@@ -85,10 +85,19 @@ export const registerUser = async (
       maxAge: 48 * 60 * 60 * 1000,
     });
 
+    res.cookie('token', token, {
+      httpOnly: true,
+      secure: env.NODE_ENV === 'production',
+      sameSite: 'strict',
+      maxAge: 48 * 60 * 60 * 1000, // 48 hours
+    });
+
     res.status(201).json({
       message: 'User registration successful!',
-      token,
-      data: newUser,
+      user: {
+        id: newUser.id,
+        username: newUser.username,
+      },
     });
   } catch (err) {
     if (err instanceof Prisma.PrismaClientKnownRequestError) {
@@ -181,4 +190,85 @@ export const logOutUser = (_: Request, res: Response): void => {
   });
 
   res.status(302).redirect('/api/v1/auth/login');
+};
+
+export const checkAuthStatus = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+): Promise<void> => {
+  try {
+    // Extract token from cookie
+    const token = req.cookies?.token;
+
+    if (!token) {
+      res.status(401).json({
+        message: 'No authentication token found.',
+        isAuthenticated: false,
+      });
+      return;
+    }
+
+    // Verify JWT token
+    let decoded: JwtPayload;
+    try {
+      decoded = jwt.verify(token, env.JWT_SECRET as string) as JwtPayload;
+    } catch (jwtError) {
+      res.status(401).json({
+        message: 'Invalid or expired authentication token.',
+        isAuthenticated: false,
+      });
+      console.error('Error decoding JWT payload', jwtError);
+      return;
+    }
+
+    // Fetch user data from database to ensure user still exists
+    const user = await prisma.users.findUnique({
+      where: { id: decoded.userId },
+      select: {
+        id: true,
+        username: true,
+        default_currency_id: true,
+        created_at: true,
+      },
+    });
+
+    if (!user) {
+      // User no longer exists in database
+      res.status(401).json({
+        message: 'User account not found.',
+        isAuthenticated: false,
+      });
+      return;
+    }
+
+    let defaultCurrency = null;
+    if (user.default_currency_id) {
+      defaultCurrency = await prisma.currencies.findUnique({
+        where: { id: user.default_currency_id },
+        select: {
+          id: true,
+          code: true,
+          name: true,
+          symbol: true,
+        },
+      });
+    }
+
+    // Authentication successful - return user data
+    res.status(200).json({
+      message: 'Authentication valid.',
+      isAuthenticated: true,
+      user: {
+        id: user.id,
+        username: user.username,
+        defaultCurrencyId: user.default_currency_id,
+        createdAt: user.created_at,
+      },
+      default_currency: defaultCurrency,
+    });
+  } catch (err) {
+    console.error('Error checking auth status:', err);
+    next(err);
+  }
 };

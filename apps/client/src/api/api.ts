@@ -57,9 +57,9 @@ const apiCall = async (method: string, url: string, data: unknown = null) => {
 };
 
 // Export individual methods for convenience
-export const get = (url: string) => apiCall('get', url, null);
-export const post = (url: string, data: unknown) => apiCall('post', url, data);
-export const put = (url: string, data: unknown) => apiCall('put', url, data);
-export const patch = (url: string, data: unknown) =>
+export const GET = (url: string) => apiCall('get', url, null);
+export const POST = (url: string, data: unknown) => apiCall('post', url, data);
+export const PUT = (url: string, data: unknown) => apiCall('put', url, data);
+export const PATCH = (url: string, data: unknown) =>
   apiCall('patch', url, data);
-export const del = (url: string) => apiCall('delete', url, null); // 'delete' is a reserved keyword, use 'del'
+export const DEL = (url: string) => apiCall('delete', url, null); // 'delete' is a reserved keyword, use 'del'

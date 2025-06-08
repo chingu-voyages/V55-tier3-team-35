@@ -2,11 +2,11 @@ import { create } from 'zustand';
 
 import {
   AUTH_ENDPOINTS,
-  USER_ENDPOINTS,
   CURRENCY_ENDPOINTS,
+  USER_ENDPOINTS,
 } from '@/api/constants';
 
-import { post, patch, get } from '../api/api';
+import { GET, PATCH, POST } from '../api/api';
 import {
   type AuthState,
   type AuthLoginData,
@@ -17,23 +17,23 @@ import {
 
 export const useAuthStore = create<AuthState>()((set) => ({
   token: null,
-  isLoading: false,
+  isLoading: true,
   isAuthenticated: false,
   user: {
     id: null,
     username: null,
   },
-  defaultCurrency: null,
+  defaultCurrencyId: null,
 
   authLogin: async (data: AuthLoginData) => {
     set({ isLoading: true });
     try {
-      const response = await post(AUTH_ENDPOINTS.LOGIN, data);
+      const response = await POST(AUTH_ENDPOINTS.LOGIN, data);
       set({
-        token: response.token,
+        token: 'set_by_cookie',
         isAuthenticated: true,
         user: response.user,
-        defaultCurrency: response.default_currency,
+        defaultCurrencyId: response.default_currency_id,
         isLoading: false,
       });
       return response;
@@ -43,7 +43,8 @@ export const useAuthStore = create<AuthState>()((set) => ({
     }
   },
 
-  authLogout: () => {
+  authLogout: async () => {
+    await POST(AUTH_ENDPOINTS.LOGOUT, {});
     set({
       token: null,
       isAuthenticated: false,
@@ -54,16 +55,13 @@ export const useAuthStore = create<AuthState>()((set) => ({
   authRegister: async (data: AuthRegisterData) => {
     set({ isLoading: true });
     try {
-      const response = await post(AUTH_ENDPOINTS.REGISTER, data);
+      const response = await POST(AUTH_ENDPOINTS.REGISTER, data);
       set({
-        token: response.token,
+        token: 'set_by_cookie',
         isAuthenticated: true,
-        user: {
-          id: response.data.id,
-          username: response.data.username,
-          defaultCurrencyId: response.data.default_currency_id,
-        },
+        user: response.user,
         isLoading: false,
+        defaultCurrencyId: null,
       });
     } catch (error: unknown) {
       set({ isLoading: false, isAuthenticated: false });
@@ -72,7 +70,22 @@ export const useAuthStore = create<AuthState>()((set) => ({
   },
 
   checkAuth: async () => {
-    set({ isAuthenticated: true });
+    try {
+      const response = await GET(AUTH_ENDPOINTS.CHECK_STATUS);
+      set({
+        isAuthenticated: true,
+        user: response.user,
+        defaultCurrencyId: response.default_currency,
+        isLoading: false,
+      });
+    } catch (error) {
+      set({
+        isAuthenticated: false,
+        user: { id: null, username: null },
+        isLoading: false,
+      });
+      console.error('User is not authenticated', error);
+    }
   },
 
   saveUserDetails: async (data: UserDetailsForm) => {
@@ -85,17 +98,17 @@ export const useAuthStore = create<AuthState>()((set) => ({
       }
 
       // Fetch currencies from the API so that we can map the currency code to the currency id
-      const currenciesResponse = await get(CURRENCY_ENDPOINTS.LIST);
+      const currenciesResponse = await GET(CURRENCY_ENDPOINTS.LIST);
       const currencies: Currency[] =
         currenciesResponse.data || currenciesResponse;
 
       // currency mapping
       const selectedCurrency = currencies.find(
-        (currency) => currency.code === data.default_currency,
+        (currency) => currency.id === data.default_currency_id,
       );
 
       if (!selectedCurrency) {
-        throw new Error(`Currency ${data.default_currency} not found`);
+        throw new Error(`Currency ${data.default_currency_id} not found`);
       }
 
       const updateData = {
@@ -105,10 +118,10 @@ export const useAuthStore = create<AuthState>()((set) => ({
         userId: currentState.user.id,
       };
 
-      await patch(USER_ENDPOINTS.UPDATE_USER, updateData);
+      await PATCH(USER_ENDPOINTS.UPDATE_USER, updateData);
 
       set({
-        defaultCurrency: data.default_currency,
+        defaultCurrencyId: data.default_currency_id,
         user: {
           ...currentState.user,
           firstName: data.firstName,
@@ -117,7 +130,7 @@ export const useAuthStore = create<AuthState>()((set) => ({
         isLoading: false,
       });
 
-      return data.default_currency;
+      return data.default_currency_id;
     } catch (error: unknown) {
       set({ isLoading: false });
       throw error;

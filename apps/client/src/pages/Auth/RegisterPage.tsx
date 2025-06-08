@@ -10,13 +10,13 @@ import { useAuthStore } from '@/stores/authStores';
 import { type AxioError } from '@/types/stores.d';
 
 import { registerSchema, type RegisterSchema } from '../../lib/schema';
-import styles from '../Landing/LandingPage.module.css';
+import styles from '../landing/LandingPage.module.css';
 
 const RegisterPage = () => {
   const navigate = useNavigate();
   const [registerError, setRegisterError] = useState<string | null>(null);
   const [showPassword, setShowPassword] = useState(false);
-  const { isLoading, authRegister } = useAuthStore();
+  const { isLoading, authRegister, defaultCurrencyId } = useAuthStore();
   const {
     register,
     handleSubmit,
@@ -33,7 +33,11 @@ const RegisterPage = () => {
     try {
       setRegisterError(null);
       await authRegister(data);
-      navigate('/user-details');
+      if (defaultCurrencyId) {
+        navigate('/home');
+      } else {
+        navigate('/user-details');
+      }
     } catch (error: unknown) {
       if (error instanceof Error) {
         const errorMessage =
@@ -126,7 +130,7 @@ const RegisterPage = () => {
                   </button>
                 </div>
                 {errors.password && (
-                  <p className="text-xs text-red-500 mt-1">
+                  <p className="text-sm text-red-500 mt-1">
                     {errors.password.message}
                   </p>
                 )}
@@ -162,7 +166,7 @@ const RegisterPage = () => {
                   </button>
                 </div>
                 {errors.confirmPassword && (
-                  <p className="text-xs text-red-500 mt-1">
+                  <p className="text-sm text-red-500 mt-1">
                     {errors.confirmPassword.message}
                   </p>
                 )}

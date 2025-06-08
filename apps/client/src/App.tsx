@@ -5,16 +5,24 @@ import LoginPage from './pages/Auth/LoginPage';
 import RegisterPage from './pages/Auth/RegisterPage';
 import UserDetailsPage from './pages/Auth/UserDetailsPage';
 import HomePage from './pages/home/HomePage';
-import LandingPage from './pages/Landing/LandingPage';
+import LandingPage from './pages/landing/LandingPage.tsx';
+import TransactionPage from './pages/transactions/TransactionsPage';
 import { useAuthStore } from './stores/authStores';
 
 function App() {
-  const { isAuthenticated, checkAuth } = useAuthStore();
+  const { isAuthenticated, isLoading, checkAuth } = useAuthStore();
 
   useEffect(() => {
     checkAuth();
   }, [checkAuth]);
 
+  if (isLoading) {
+    return (
+      <div className="flex h-screen items-center justify-center">
+        <p>Loading application...</p>
+      </div>
+    );
+  }
   return (
     <Routes>
       {/* Public routes - always accessible */}
@@ -40,7 +48,16 @@ function App() {
           isAuthenticated ? <HomePage /> : <Navigate to="/login" replace />
         }
       />
-
+      <Route
+        path="/transactions"
+        element={
+          isAuthenticated ? (
+            <TransactionPage />
+          ) : (
+            <Navigate to="/login" replace />
+          )
+        }
+      />
       {/* Catch all route */}
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>

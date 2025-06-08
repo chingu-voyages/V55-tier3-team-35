@@ -16,8 +16,8 @@ export interface AuthState {
   authLogout: () => void;
   authRegister: (data: AuthRegisterData) => Promise<void>;
   checkAuth: () => Promise<void>;
-  defaultCurrency: string | null;
-  saveUserDetails: (data: UserDetailsForm) => Promise<string>;
+  defaultCurrencyId: string | number | null;
+  saveUserDetails: (data: UserDetailsForm) => Promise<number>;
 }
 
 interface User {
@@ -41,7 +41,7 @@ export interface AuthRegisterData {
 export interface UserDetailsForm {
   firstName: string;
   lastName: string;
-  default_currency: string;
+  default_currency_id: number;
 }
 
 export interface Currency {

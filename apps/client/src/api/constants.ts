@@ -1,20 +1,10 @@
-// src/api/constants.ts
-
-interface AuthEndpoints {
-  LOGIN: string;
-  REGISTER: string;
-  ME: string;
-  LOGOUT: string;
-  USER_DETAILS: string;
-}
-
-interface UserEndpoints {
-  UPDATE_USER: string;
-}
-
-interface CurrencyEndpoints {
-  LIST: string;
-}
+import type {
+  AuthEndpoints,
+  UserEndpoints,
+  CurrencyEndpoints,
+  CategoryEndpoints,
+  TransactionEndpoints,
+} from '@/types/endpoints';
 
 // Authentication Endpoints
 export const AUTH_ENDPOINTS: AuthEndpoints = {
@@ -23,6 +13,7 @@ export const AUTH_ENDPOINTS: AuthEndpoints = {
   ME: '/auth/me',
   LOGOUT: '/auth/logout',
   USER_DETAILS: '/auth/user-details',
+  CHECK_STATUS: '/auth/status',
 };
 
 // User Endpoints
@@ -34,3 +25,16 @@ export const USER_ENDPOINTS: UserEndpoints = {
 export const CURRENCY_ENDPOINTS: CurrencyEndpoints = {
   LIST: '/currencies', // GET /currencies for listing all currencies
 };
+
+// Transaction Endpoints
+export const TRANSACTION_ENDPOINTS: TransactionEndpoints = {
+  CREATE: '/transactions',
+  UPDATE: (transactionId) => `transactions/${transactionId}`,
+  LIST_BY_USER: (userId) => `transactions/user/${userId}`,
+  DELETE: (transactionId) => `transactions/${transactionId}`,
+} as const;
+
+// Category Endpoints
+export const CATEGORY_ENDPOINTS: CategoryEndpoints = {
+  LIST_BY_USER: (userId) => `categories/user/${userId}`,
+} as const;
