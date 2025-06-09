@@ -67,7 +67,6 @@ export const registerUser = async (
         `Expected to create ${templateCategories.length} categories, but only created ${createdCategories.count}`,
       );
     }
-
     // Generate JWT token for the newly registered user
     const token = jwt.sign(
       {
@@ -82,7 +81,7 @@ export const registerUser = async (
     res.cookie('token', token, {
       httpOnly: true,
       secure: env.NODE_ENV === 'production',
-      sameSite: 'strict',
+      sameSite: process.env.CLIENT_HOST === 'ALLOW_ALL' ? 'none' : 'strict',
       maxAge: 48 * 60 * 60 * 1000,
     });
 
@@ -157,7 +156,7 @@ export const logInUser = async (
     res.cookie('token', token, {
       httpOnly: true,
       secure: env.NODE_ENV === 'production',
-      sameSite: 'strict',
+      sameSite: process.env.CLIENT_HOST === 'ALLOW_ALL' ? 'none' : 'strict',
       maxAge: 48 * 60 * 60 * 1000,
     });
 
