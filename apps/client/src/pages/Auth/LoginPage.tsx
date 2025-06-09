@@ -2,6 +2,7 @@ import { Eye, EyeOff, Target, ChevronLeft } from 'lucide-react';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 
 import { Button } from '@/components/ui/button';
 import { useAuthStore } from '@/stores/authStores';
@@ -55,9 +56,9 @@ const LoginPage = () => {
         <div className="w-full max-w-md bg-white rounded-xl shadow-xl p-6 md:p-10">
           <div className="flex items-center space-x-3 mb-8 md:mb-12">
             <div className="flex items-center justify-center">
-              <a href="/">
+              <Link to="/">
                 <ChevronLeft className="w-8 h-8 text-black" />
-              </a>
+              </Link>
             </div>
             <div className="w-10 h-10 md:w-12 md:h-12 bg-black rounded-lg flex items-center justify-center ml-2">
               <Target className="w-8 h-8 text-white" />
@@ -144,12 +145,12 @@ const LoginPage = () => {
               <div className="text-center mt-4 md:mt-6">
                 <p className="text-sm text-gray-600">
                   Don't have an account?{' '}
-                  <a
-                    href="/register"
+                  <Link
+                    to="/register"
                     className="text-indigo-600 hover:text-black-700 font-medium"
                   >
                     Register
-                  </a>
+                  </Link>
                 </p>
               </div>
             </form>
