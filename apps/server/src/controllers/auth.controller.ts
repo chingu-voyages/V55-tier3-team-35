@@ -79,6 +79,12 @@ export const registerUser = async (
         expiresIn: '48h',
       },
     );
+    res.cookie('token', token, {
+      httpOnly: true,
+      secure: env.NODE_ENV === 'production',
+      sameSite: 'strict',
+      maxAge: 48 * 60 * 60 * 1000,
+    });
 
     res.status(201).json({
       message: 'User registration successful!',
@@ -172,8 +178,8 @@ export const logOutUser = (req: Request, res: Response): void => {
   res.clearCookie('token', {
     httpOnly: true,
     sameSite: 'strict',
-    secure: true,
+    secure: env.NODE_ENV === 'production',
   });
 
-  res.status(302).redirect('/api/v1/auth/login');
+  res.status(200).json({ message: 'Logout successful' });
 };

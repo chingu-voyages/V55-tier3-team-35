@@ -4,18 +4,18 @@ import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useNavigate } from 'react-router-dom';
 
-import { registerSchema, type RegisterSchema } from '../../lib/schema';
-import styles from '../Landing/LandingPage.module.css';
-
 import { Button } from '@/components/ui/button';
 import { useAuthStore } from '@/stores/authStores';
 import { type AxioError } from '@/types/stores.d';
+
+import { registerSchema, type RegisterSchema } from '../../lib/schema';
+import styles from '../Landing/LandingPage.module.css';
 
 const RegisterPage = () => {
   const navigate = useNavigate();
   const [registerError, setRegisterError] = useState<string | null>(null);
   const [showPassword, setShowPassword] = useState(false);
-  const { isLoading, authRegister, defaultCurrency } = useAuthStore();
+  const { isLoading, authRegister } = useAuthStore();
   const {
     register,
     handleSubmit,
@@ -32,11 +32,7 @@ const RegisterPage = () => {
     try {
       setRegisterError(null);
       await authRegister(data);
-      if (defaultCurrency) {
-        navigate('/home');
-      } else {
-        navigate('/user-details');
-      }
+      navigate('/user-details');
     } catch (error: unknown) {
       if (error instanceof Error) {
         const errorMessage =

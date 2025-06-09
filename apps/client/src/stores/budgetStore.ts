@@ -1,9 +1,9 @@
 import { create } from 'zustand';
 
-import { post, patch, del, get as apiGet } from '../api/api';
-
 import { capitalize } from '@/lib/utils';
 import type { Budget, BudgetFormData } from '@/types/budget.types';
+
+import { post, patch, del, get as apiGet } from '../api/api';
 
 const mockBudgets: Budget[] = [
   {

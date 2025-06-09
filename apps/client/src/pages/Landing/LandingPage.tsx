@@ -1,11 +1,11 @@
-import styles from './LandingPage.module.css';
-
 import CTA from '@/components/landing/CTA';
 import FAQ from '@/components/landing/FAQ';
 import Features from '@/components/landing/Features';
 import Footer from '@/components/landing/Footer';
 import Hero from '@/components/landing/Hero';
 import Nav from '@/components/landing/Nav';
+
+import styles from './LandingPage.module.css';
 
 const LandingPage = () => {
   return (

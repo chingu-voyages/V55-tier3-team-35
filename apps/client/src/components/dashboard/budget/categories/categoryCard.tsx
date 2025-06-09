@@ -1,9 +1,6 @@
 import { MoreHorizontal } from 'lucide-react';
 import { useState } from 'react';
 
-import DeleteBudgetDialog from './deleteBudgetDialog';
-import { BudgetDialog } from '../budgetDialog';
-
 import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
@@ -13,6 +10,9 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { Progress } from '@/components/ui/progress';
 import type { Budget } from '@/types/budget.types';
+
+import { BudgetDialog } from '../budgetDialog';
+import DeleteBudgetDialog from './deleteBudgetDialog';
 
 interface CategoryCardProps {
   budget: Budget;

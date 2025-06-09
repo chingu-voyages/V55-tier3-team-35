@@ -1,8 +1,8 @@
 import { PieChart, Pie, Cell } from 'recharts';
 
-import SpendingSummary from './spendingSummary';
-
 import { useBudgetStore } from '@/stores/budgetStore';
+
+import SpendingSummary from './spendingSummary';
 
 const BudgetPieChart: React.FC = () => {
   const state = useBudgetStore();

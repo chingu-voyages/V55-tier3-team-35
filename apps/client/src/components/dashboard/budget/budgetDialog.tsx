@@ -1,8 +1,6 @@
 import React, { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 
-import { BudgetFormFields } from './budgetFormFields';
-
 import { Button } from '@/components/ui/button';
 import {
   Dialog,
@@ -15,6 +13,8 @@ import { Form } from '@/components/ui/form';
 import { CATEGORY_OPTIONS } from '@/constants/budgetOptions';
 import { useBudgetStore } from '@/stores/budgetStore';
 import type { Budget, BudgetFormData } from '@/types/budget.types';
+
+import { BudgetFormFields } from './budgetFormFields';
 
 interface BudgetDialogProps {
   open: boolean;
@@ -59,8 +59,6 @@ export const BudgetDialog: React.FC<BudgetDialogProps> = ({
   }, [isEdit, budget, open, form]);
 
   const onSubmit = async (data: BudgetFormData) => {
-    console.log('Form submission data:', data);
-
     if (isEdit && budget) {
       await updateBudget(budget.id, {
         category: data.category,

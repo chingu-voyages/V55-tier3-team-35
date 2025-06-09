@@ -2,10 +2,10 @@ import { ArrowRight } from 'lucide-react';
 import { CreditCard } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
+import { Button } from '@/components/ui/button';
+
 import ChartCard from './ChartCard';
 import StarryBackground from './StarryBackground';
-
-import { Button } from '@/components/ui/button';
 
 const Hero = () => {
   const navigate = useNavigate();

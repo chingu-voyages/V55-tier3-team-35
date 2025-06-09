@@ -7,11 +7,10 @@ import { useBudgetStore } from '@/stores/budgetStore';
 
 const BudgetsTab: React.FC = () => {
   const { budgets, fetchBudgets } = useBudgetStore();
-  console.log(budgets);
 
   useEffect(() => {
     fetchBudgets();
-  }, []);
+  }, [fetchBudgets]);
 
   return (
     <div className="px-[16px] py-[24px] lg:py-[32px] lg:px-[40px] mb-[66px] md:mb-0">

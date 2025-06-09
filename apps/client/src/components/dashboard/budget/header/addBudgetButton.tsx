@@ -203,9 +203,9 @@
 import { PlusCircle } from 'lucide-react';
 import { useState } from 'react';
 
-import { BudgetDialog } from '../budgetDialog';
-
 import { Button } from '@/components/ui/button';
+
+import { BudgetDialog } from '../budgetDialog';
 
 const AddBudgetButton: React.FC = () => {
   const [open, setOpen] = useState(false);

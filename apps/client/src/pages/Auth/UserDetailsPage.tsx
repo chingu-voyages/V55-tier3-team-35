@@ -3,14 +3,14 @@ import { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { useNavigate } from 'react-router-dom';
 
-import styles from '../Landing/LandingPage.module.css';
-
 import { get } from '@/api/api';
 import { CURRENCY_ENDPOINTS } from '@/api/constants';
 import { Button } from '@/components/ui/button';
 import { type UserDetailsForm } from '@/lib/schema';
 import { useAuthStore } from '@/stores/authStores';
 import { type AxioError, type Currency } from '@/types/stores.d';
+
+import styles from '../Landing/LandingPage.module.css';
 
 const UserDetailsPage = () => {
   const [error, setError] = useState<string | null>(null);

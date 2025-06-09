@@ -20,12 +20,12 @@
   },
   "lint-staged": {
     "apps/client/**/*.{js,jsx,ts,tsx}": [
-      "eslint --config apps/client/eslint.config.js --fix",
-      "prettier --config apps/client/.prettierrc --write"
+      "cd apps/client && eslint --fix --",
+      "cd apps/client && prettier --write --"
     ],
     "apps/server/**/*.{js,ts}": [
-      "eslint --config apps/server/eslint.config.js --fix",
-      "prettier --config apps/server/.prettierrc --write"
+      "cd apps/server && eslint --fix --",
+      "cd apps/server && prettier --write --"
     ],
     "*.{json,md}": [
       "prettier --write"

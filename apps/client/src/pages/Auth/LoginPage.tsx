@@ -3,11 +3,11 @@ import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useNavigate } from 'react-router-dom';
 
-import styles from '../Landing/LandingPage.module.css';
-
 import { Button } from '@/components/ui/button';
 import { useAuthStore } from '@/stores/authStores';
 import { type AxioError } from '@/types/stores.d';
+
+import styles from '../Landing/LandingPage.module.css';
 
 type LoginFormData = {
   username: string;
