@@ -24,27 +24,21 @@ export const transactionService = {
   },
 
   async updateTransaction(
-    userId: number,
     transactionId: number,
     updateData: updateTransactionInput,
   ): Promise<Transaction> {
     return prisma.transactions.update({
       where: {
         id: transactionId,
-        user_id: userId,
       },
       data: updateData,
     });
   },
 
-  async deleteTransaction(
-    userId: number,
-    transactionId: number,
-  ): Promise<Transaction> {
+  async deleteTransaction(transactionId: number): Promise<Transaction> {
     return prisma.transactions.delete({
       where: {
         id: transactionId,
-        user_id: userId,
       },
     });
   },

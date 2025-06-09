@@ -41,6 +41,10 @@ export const deleteTransactionSchema = z.object({
   id: z.coerce.number().positive(),
 });
 
+export const transactionIdSchema = z.object({
+  id: z.coerce.number().positive(),
+});
+
 export const createTransactionSchema = transactionSchema.omit({ id: true });
 export type createTransactionInput = z.infer<typeof createTransactionSchema>;
 export type updateTransactionInput = z.infer<

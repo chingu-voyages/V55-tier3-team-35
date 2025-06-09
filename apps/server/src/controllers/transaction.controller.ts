@@ -5,9 +5,8 @@ import { transactionService } from '../services/transaction.service';
 import {
   createTransactionSchema,
   getTransactionsSchema,
-  updateTransactionParamsSchema,
   updateTransactionBodySchema,
-  deleteTransactionSchema,
+  transactionIdSchema,
 } from './../schemas/transactionSchema';
 
 const createTransaction = async (
@@ -72,7 +71,7 @@ const updateTransaction = async (
   res: Response,
   next: NextFunction,
 ) => {
-  const paramsValidation = updateTransactionParamsSchema.safeParse(req.params);
+  const paramsValidation = transactionIdSchema.safeParse(req.params);
   const bodyValidation = updateTransactionBodySchema.safeParse(req.body);
 
   try {
@@ -98,14 +97,10 @@ const updateTransaction = async (
       return;
     }
 
-    const { userId, id } = paramsValidation.data;
+    const { id } = paramsValidation.data;
     const updateData = bodyValidation.data;
 
-    const response = await transactionService.updateTransaction(
-      userId,
-      id,
-      updateData,
-    );
+    const response = await transactionService.updateTransaction(id, updateData);
     res
       .status(200)
       .json({ message: 'Transaction updated successfully', data: response });
@@ -119,7 +114,7 @@ const deleteTransaction = async (
   res: Response,
   next: NextFunction,
 ) => {
-  const validationResult = deleteTransactionSchema.safeParse(req.params);
+  const validationResult = transactionIdSchema.safeParse(req.params);
 
   try {
     if (!validationResult.success) {
@@ -130,9 +125,9 @@ const deleteTransaction = async (
       return;
     }
 
-    const { userId, id } = validationResult.data;
+    const { id } = validationResult.data;
 
-    const response = await transactionService.deleteTransaction(userId, id);
+    const response = await transactionService.deleteTransaction(id);
     res
       .status(200)
       .json({ message: 'Transaction deleted successfully', data: response });
