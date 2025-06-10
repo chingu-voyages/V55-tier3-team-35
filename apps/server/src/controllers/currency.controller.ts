@@ -3,7 +3,7 @@ import type { NextFunction, Request, Response } from 'express';
 import { currencyService } from '../services/currency.service';
 
 export const listCurrencies = async (
-  req: Request,
+  _: Request,
   res: Response,
   next: NextFunction,
 ): Promise<void> => {

@@ -2,8 +2,7 @@ import { Target, ChevronLeft } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { useNavigate } from 'react-router-dom';
-
-import styles from '../Landing/LandingPage.module.css';
+import { Link } from 'react-router-dom';
 
 import { get } from '@/api/api';
 import { CURRENCY_ENDPOINTS } from '@/api/constants';
@@ -11,6 +10,8 @@ import { Button } from '@/components/ui/button';
 import { type UserDetailsForm } from '@/lib/schema';
 import { useAuthStore } from '@/stores/authStores';
 import { type AxioError, type Currency } from '@/types/stores.d';
+
+import styles from '../Landing/LandingPage.module.css';
 
 const UserDetailsPage = () => {
   const [error, setError] = useState<string | null>(null);
@@ -63,9 +64,9 @@ const UserDetailsPage = () => {
         <div className="w-full max-w-md bg-white rounded-xl shadow-xl p-6 md:p-10">
           <div className="flex items-center space-x-3 mb-8 md:mb-12">
             <div className="flex items-center justify-center">
-              <a href="/">
+              <Link to="/">
                 <ChevronLeft className="w-8 h-8 text-black" />
-              </a>
+              </Link>
             </div>
             <div className="w-10 h-10 md:w-12 md:h-12 bg-black rounded-lg flex items-center justify-center ml-2">
               <Target className="w-8 h-8 text-white" />

@@ -1,9 +1,9 @@
 import { ArrowRight } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
-import StarryBackground from './StarryBackground';
-
 import { Button } from '@/components/ui/button';
+
+import StarryBackground from './StarryBackground';
 
 const CTA = () => {
   const navigate = useNavigate();

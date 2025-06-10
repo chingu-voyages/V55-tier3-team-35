@@ -3,19 +3,20 @@ import { ChevronLeft, Eye, EyeOff, Target } from 'lucide-react';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useNavigate } from 'react-router-dom';
-
-import { registerSchema, type RegisterSchema } from '../../lib/schema';
-import styles from '../Landing/LandingPage.module.css';
+import { Link } from 'react-router-dom';
 
 import { Button } from '@/components/ui/button';
 import { useAuthStore } from '@/stores/authStores';
 import { type AxioError } from '@/types/stores.d';
 
+import { registerSchema, type RegisterSchema } from '../../lib/schema';
+import styles from '../Landing/LandingPage.module.css';
+
 const RegisterPage = () => {
   const navigate = useNavigate();
   const [registerError, setRegisterError] = useState<string | null>(null);
   const [showPassword, setShowPassword] = useState(false);
-  const { isLoading, authRegister, defaultCurrency } = useAuthStore();
+  const { isLoading, authRegister } = useAuthStore();
   const {
     register,
     handleSubmit,
@@ -32,11 +33,7 @@ const RegisterPage = () => {
     try {
       setRegisterError(null);
       await authRegister(data);
-      if (defaultCurrency) {
-        navigate('/home');
-      } else {
-        navigate('/user-details');
-      }
+      navigate('/user-details');
     } catch (error: unknown) {
       if (error instanceof Error) {
         const errorMessage =
@@ -56,9 +53,9 @@ const RegisterPage = () => {
         <div className="w-full max-w-md bg-white rounded-xl shadow-xl p-6 md:p-10">
           <div className="flex items-center space-x-3 mb-8 md:mb-12">
             <div className="flex items-center justify-center">
-              <a href="/">
+              <Link to="/">
                 <ChevronLeft className="w-8 h-8 text-black" />
-              </a>
+              </Link>
             </div>
             <div className="w-10 h-10 md:w-12 md:h-12 bg-black rounded-lg flex items-center justify-center">
               <Target className="w-8 h-8 text-white" />
@@ -192,12 +189,12 @@ const RegisterPage = () => {
               <div className="text-center mt-4 md:mt-6">
                 <p className="text-sm text-gray-600">
                   Already have an account?{' '}
-                  <a
-                    href="/login"
+                  <Link
+                    to="/login"
                     className="text-indigo-600 hover:text-indigo-700 font-medium"
                   >
                     Sign in
-                  </a>
+                  </Link>
                 </p>
               </div>
             </form>

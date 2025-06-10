@@ -1,5 +1,6 @@
 @import "tailwindcss";
 @import "tw-animate-css";
+@import "./styles/design-system.css";
 
 @custom-variant dark (&:is(.dark *));
 
@@ -114,8 +115,12 @@
   * {
     @apply border-border outline-ring/50;
   }
+
   body {
     @apply bg-background text-foreground;
   }
 }
 
+body{
+  box-sizing: border-box;
+}

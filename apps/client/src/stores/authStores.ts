@@ -1,5 +1,11 @@
 import { create } from 'zustand';
 
+import {
+  AUTH_ENDPOINTS,
+  USER_ENDPOINTS,
+  CURRENCY_ENDPOINTS,
+} from '@/api/constants';
+
 import { post, patch, get } from '../api/api';
 import {
   type AuthState,
@@ -8,12 +14,6 @@ import {
   type UserDetailsForm,
   type Currency,
 } from './../types/stores.d';
-
-import {
-  AUTH_ENDPOINTS,
-  USER_ENDPOINTS,
-  CURRENCY_ENDPOINTS,
-} from '@/api/constants';
 
 export const useAuthStore = create<AuthState>()((set) => ({
   token: null,
