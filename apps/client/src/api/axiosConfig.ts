@@ -11,7 +11,6 @@ const API = axios.create({
   timeout: 10000,
   withCredentials: true, // Enable sending cookies with requests
 });
-console.log('VITE_API_BASE_URL', import.meta.env.VITE_API_BASE_URL);
 
 API.interceptors.request.use(
   (config) => {

@@ -1,7 +1,7 @@
 // src/api/apiCaller.js
-import API from './axiosConfig'; // Your configured Axios instance
-
 import { type AxioError } from '@/types/stores.d';
+
+import API from './axiosConfig'; // Your configured Axios instance
 
 /**
  * Generic API call function.

@@ -4,16 +4,15 @@ import prisma from '../database/db';
 import { updateUserSchema } from '../schemas/updateUserSchema';
 import { userService } from '../services/user.service';
 
-export const createUser = (req: Request, res: Response): void => {
+export const createUser = (_: Request, res: Response): void => {
   res.json({ message: 'This route will create a new user.' });
 };
 
 export const getAllUsers = async (
-  req: Request,
+  _: Request,
   res: Response,
   next: NextFunction,
 ): Promise<void> => {
-  console.log('getting all users ...');
   try {
     const users = await prisma.users.findMany();
     res.status(200).json(users);
@@ -78,6 +77,6 @@ export const updateUser = async (
   }
 };
 
-export const deleteUser = (req: Request, res: Response): void => {
+export const deleteUser = (_: Request, res: Response): void => {
   res.json({ message: 'This route will delete a user.' });
 };
