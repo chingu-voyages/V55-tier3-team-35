@@ -1,10 +1,10 @@
 import { create } from 'zustand';
 
-import { GET } from './../api/api';
-import { useAuthStore } from './authStores';
-
 import { TRANSACTION_ENDPOINTS } from '@/api/constants';
 import type { Transaction } from '@/schemas/transactionFormSchema';
+
+import { GET } from './../api/api';
+import { useAuthStore } from './authStores';
 
 interface TransactionState {
   transactions: Transaction[];

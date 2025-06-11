@@ -17,7 +17,8 @@ type LoginFormData = {
 const LoginPage = () => {
   const [error, setError] = useState<string | null>(null);
   const [showPassword, setShowPassword] = useState(false);
-  const { isLoading, authLogin } = useAuthStore();
+  const [isLoading, setIsLoading] = useState(false);
+  const { authLogin } = useAuthStore();
   const navigate = useNavigate();
 
   const togglePasswordVisibility = () => {
@@ -28,11 +29,11 @@ const LoginPage = () => {
 
   const onSubmit = async (data: LoginFormData) => {
     setError(null);
+    setIsLoading(true);
     try {
       const response = await authLogin(data);
-
       if (response.user.defaultCurrencyId) {
-        navigate('/home');
+        navigate('/overview');
       } else {
         navigate('/user-details');
       }
@@ -46,6 +47,8 @@ const LoginPage = () => {
       } else {
         setError('An unexpected error occurred.');
       }
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -78,7 +81,10 @@ const LoginPage = () => {
             </h1>
 
             <form
-              onSubmit={handleSubmit(onSubmit)}
+              onSubmit={(e) => {
+                e.preventDefault();
+                handleSubmit(onSubmit)(e);
+              }}
               className="space-y-4 md:space-y-6"
             >
               <div className="flex flex-col gap-1.5 md:gap-2">

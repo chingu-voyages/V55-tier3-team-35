@@ -6,37 +6,70 @@ import {
   ArrowRight,
   LogOut,
 } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
+import { useAuthStore } from '@/stores/authStores';
 
 interface SidebarItem {
   id: string;
   label: string;
   icon: React.ComponentType<{ className?: string }>;
+  path: string;
 }
 
 interface SidebarProps {
-  activeTab: string;
-  onTabChange: (tab: string) => void;
   isCollapsed: boolean;
   onToggle: () => void;
 }
 
 const sidebarItems: SidebarItem[] = [
-  { id: 'dashboard', label: 'Overview', icon: Home },
-  { id: 'transactions', label: 'Transactions', icon: ArrowLeftRight },
-  { id: 'budgets', label: 'Budgets', icon: CircleDollarSign },
+  {
+    id: 'dashboard',
+    label: 'Overview',
+    icon: Home,
+    path: '/overview',
+  },
+  {
+    id: 'transactions',
+    label: 'Transactions',
+    icon: ArrowLeftRight,
+    path: '/transactions',
+  },
+  {
+    id: 'budgets',
+    label: 'Budgets',
+    icon: CircleDollarSign,
+    path: '/budgets',
+  },
 ];
 
-const Sidebar: React.FC<SidebarProps> = ({
-  activeTab,
-  onTabChange,
-  isCollapsed,
-  onToggle,
-}) => {
+const Sidebar: React.FC<SidebarProps> = ({ isCollapsed, onToggle }) => {
   const navigate = useNavigate();
+  const location = useLocation();
+  const { authLogout } = useAuthStore();
+
+  const currentPath = location.pathname;
+  const activeTab =
+    sidebarItems.find((item) => currentPath.startsWith(item.path))?.id ||
+    'budgets';
+
+  const handleLogout = async () => {
+    try {
+      await authLogout();
+      navigate('/');
+    } catch (error) {
+      console.error('Logout failed:', error);
+      // Still navigate even if logout fails
+      navigate('/');
+    }
+  };
+
+  const handleNavigation = (path: string) => {
+    navigate(path);
+  };
+
   return (
     <div
       className={cn(
@@ -44,24 +77,27 @@ const Sidebar: React.FC<SidebarProps> = ({
         isCollapsed ? 'w-20' : 'w-64',
       )}
     >
-      <div className="p-6  tracking-tight">
+      {/* Header */}
+      <div className="p-6 tracking-tight">
         {isCollapsed ? (
           <span className="text-xl font-bold text-white">FT</span>
         ) : (
           <h2 className="text-xl font-bold text-white">FinTrack</h2>
         )}
       </div>
-      <div className="flex-1 ">
+
+      {/* Navigation Items */}
+      <div className="flex-1">
         {sidebarItems.map((item) => (
           <button
             key={item.id}
-            onClick={() => onTabChange(item.id)}
+            onClick={() => handleNavigation(item.path)}
             className={cn(
-              ' rounded-r-lg flex items-center px-6 py-4 transition-colors text-left cursor-pointer',
+              'rounded-r-lg flex items-center px-6 py-4 transition-colors text-left cursor-pointer',
               activeTab === item.id
                 ? 'bg-Beige-100 text-Gray-900 border-l-2 border-l-Green'
                 : 'text-Gray-300 hover:bg-[#333333] hover:text-white',
-              isCollapsed ? 'w-[90%]' : 'w-[90%]',
+              'w-[90%]',
             )}
           >
             <item.icon
@@ -75,11 +111,13 @@ const Sidebar: React.FC<SidebarProps> = ({
           </button>
         ))}
       </div>
+
+      {/* Footer Actions */}
       <div className="p-4">
         <Button
           variant="ghost"
-          className="w-full justify-start text-Gray-300 hover:text-Red hover:bg-[#333333] mb-2 "
-          onClick={() => navigate('/')}
+          className="w-full justify-start text-Gray-300 hover:text-Red hover:bg-[#333333] mb-2"
+          onClick={handleLogout}
         >
           <LogOut className={cn('w-5 h-5', isCollapsed ? 'mx-auto' : 'mr-3')} />
           {!isCollapsed && <span>Logout</span>}

@@ -64,7 +64,6 @@ const TransactionPage = () => {
         </div>
 
         {/* Transaction List */}
-        {/* Transaction List */}
         <div className="bg-white rounded-lg shadow">
           {transactions.length === 0 ? (
             <div className="p-8 text-center text-gray-500">

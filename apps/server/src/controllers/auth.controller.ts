@@ -185,11 +185,11 @@ export const logInUser = async (
 export const logOutUser = (_: Request, res: Response): void => {
   res.clearCookie('token', {
     httpOnly: true,
-    sameSite: 'strict',
+    sameSite: process.env.CLIENT_HOST === 'ALLOW_ALL' ? 'none' : 'strict',
     secure: env.NODE_ENV === 'production',
   });
-
-  res.status(302).redirect('/api/v1/auth/login');
+  console.log('User logged out successfully');
+  res.status(200).json({ message: 'Logged out' });
 };
 
 export const checkAuthStatus = async (

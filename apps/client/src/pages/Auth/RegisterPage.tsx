@@ -16,7 +16,8 @@ const RegisterPage = () => {
   const navigate = useNavigate();
   const [registerError, setRegisterError] = useState<string | null>(null);
   const [showPassword, setShowPassword] = useState(false);
-  const { isLoading, authRegister, defaultCurrencyId } = useAuthStore();
+  const { authRegister, defaultCurrencyId } = useAuthStore();
+  const [isLoading, setIsLoading] = useState(false);
   const {
     register,
     handleSubmit,
@@ -32,9 +33,10 @@ const RegisterPage = () => {
   const onSubmit = async (data: RegisterSchema) => {
     try {
       setRegisterError(null);
+      setIsLoading(true);
       await authRegister(data);
       if (defaultCurrencyId) {
-        navigate('/home');
+        navigate('/overview');
       } else {
         navigate('/user-details');
       }
@@ -45,9 +47,10 @@ const RegisterPage = () => {
           error.message ||
           'An unexpected error occurred.';
         setRegisterError(errorMessage);
-        throw new Error(errorMessage);
       }
       throw error;
+    } finally {
+      setIsLoading(false);
     }
   };
 

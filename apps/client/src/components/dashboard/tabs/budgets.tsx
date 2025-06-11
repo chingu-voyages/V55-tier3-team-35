@@ -5,7 +5,7 @@ import BudgetHeader from '@/components/dashboard/budget/header/budgetHeader';
 import BudgetPieChart from '@/components/dashboard/budget/pieChart/budgetPieChart';
 import { useBudgetStore } from '@/stores/budgetStore';
 
-const BudgetsTab: React.FC = () => {
+const BudgetsPage: React.FC = () => {
   const { budgets, fetchBudgets } = useBudgetStore();
 
   useEffect(() => {
@@ -31,4 +31,4 @@ const BudgetsTab: React.FC = () => {
   );
 };
 
-export default BudgetsTab;
+export default BudgetsPage;

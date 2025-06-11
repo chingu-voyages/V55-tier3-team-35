@@ -46,10 +46,6 @@ const apiCall = async (method: string, url: string, data: unknown = null) => {
         (error as AxioError).response?.data?.message ||
         error.message ||
         'An unexpected error occurred.';
-      console.error(
-        `API Call Error (${method.toUpperCase()} ${url}):`,
-        errorMessage,
-      );
       throw new Error(errorMessage);
     }
     throw error;

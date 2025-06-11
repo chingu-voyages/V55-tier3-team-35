@@ -3,6 +3,7 @@ import { Target, ChevronLeft } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 
 import { GET } from '@/api/api';
 import { CURRENCY_ENDPOINTS } from '@/api/constants';
@@ -53,7 +54,7 @@ const UserDetailsPage = () => {
       setError(null);
       const response = await saveUserDetails(data);
       if (response !== null) {
-        navigate('/home');
+        navigate('/overview');
       }
     } catch (error: unknown) {
       if (error instanceof Error) {
