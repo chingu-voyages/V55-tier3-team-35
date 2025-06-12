@@ -23,26 +23,47 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+
       - name: Setup Bun
         id: setup-bun
         uses: oven-sh/setup-bun@v1
         with:
           bun-version: latest
-        # Only for local speedups with act
-      - name: Cache Bun install cache for local runs
-        if: env.ACT  # set ACT=true in your local .env or secrets
+
+      - name: Cache Bun install cache
         uses: actions/cache@v3
         with:
-            path: ~/.bun/install/cache
-            key: ${{ runner.os }}-bun-${{ hashFiles('bun.lockb') }}
-            restore-keys: |
-              ${{ runner.os }}-bun-
+          path: ~/.bun/install/cache
+          key: ${{ runner.os }}-bun-${{ hashFiles('**/bun.lockb') }}
+          restore-keys: |
+            ${{ runner.os }}-bun-
+
       - name: Install dependencies in server app
-        run: bun install
+        run: |
+          retry_count=3
+          for i in $(seq 1 $retry_count); do
+            if bun install; then
+              break
+            elif [ $i -eq $retry_count ]; then
+              echo "::error:: bun install failed after $retry_count retries. Check network connectivity or npm registry status."
+              exit 1
+            fi
+            echo "::warning:: bun install failed (attempt $i/$retry_count). Retrying in 10 seconds..."
+            sleep 10
+          done
         working-directory: ./apps/server
+
+      - name: Debug Network Issues (if install fails)
+        if: failure()
+        run: |
+          echo "::group::Debugging Network Issues"
+          curl -v https://registry.npmjs.org
+          echo "::endgroup::"
+
       - name: Generate Prisma Client
         run: bunx prisma generate
         working-directory: ./apps/server
+
       - name: Run unit tests for server app
         run: bun run test
         working-directory: ./apps/server
