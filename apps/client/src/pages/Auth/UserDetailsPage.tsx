@@ -1,17 +1,18 @@
+import { zodResolver } from '@hookform/resolvers/zod';
 import { Target, ChevronLeft } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { useNavigate } from 'react-router-dom';
 import { Link } from 'react-router-dom';
 
-import { get } from '@/api/api';
+import { GET } from '@/api/api';
 import { CURRENCY_ENDPOINTS } from '@/api/constants';
 import { Button } from '@/components/ui/button';
-import { type UserDetailsForm } from '@/lib/schema';
+import { userDetailsFormSchema, type UserDetailsForm } from '@/lib/schema';
 import { useAuthStore } from '@/stores/authStores';
 import { type AxioError, type Currency } from '@/types/stores.d';
 
-import styles from '../Landing/LandingPage.module.css';
+import styles from '../landing/LandingPage.module.css';
 
 const UserDetailsPage = () => {
   const [error, setError] = useState<string | null>(null);
@@ -20,12 +21,21 @@ const UserDetailsPage = () => {
   const { isLoading, saveUserDetails } = useAuthStore();
   const navigate = useNavigate();
 
-  const { register, handleSubmit } = useForm<UserDetailsForm>();
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm({
+    resolver: zodResolver(userDetailsFormSchema),
+    defaultValues: {
+      default_currency_id: '0',
+    },
+  });
 
   useEffect(() => {
     const fetchCurrencies = async () => {
       try {
-        const response = await get(CURRENCY_ENDPOINTS.LIST);
+        const response = await GET(CURRENCY_ENDPOINTS.LIST);
         const currencyData = response.data || response;
         setCurrencies(currencyData);
       } catch (error) {
@@ -44,7 +54,7 @@ const UserDetailsPage = () => {
       setError(null);
       const response = await saveUserDetails(data);
       if (response !== null) {
-        navigate('/home');
+        navigate('/overview');
       }
     } catch (error: unknown) {
       if (error instanceof Error) {
@@ -75,7 +85,7 @@ const UserDetailsPage = () => {
               <h1 className="text-lg md:text-xl font-bold text-black">
                 FinTrack
               </h1>
-              <p className="text-xs md:text-sm text-gray-600">
+              <p className="text-sm md:text-sm text-gray-600">
                 Your Personal Financial Tracker
               </p>
             </div>
@@ -104,6 +114,11 @@ const UserDetailsPage = () => {
                   text-black"
                   placeholder="Enter your first name"
                 />
+                {errors.firstName && (
+                  <p className="text-sm text-red-500 mt-1">
+                    {errors.firstName.message}
+                  </p>
+                )}
               </div>
               <div className="flex flex-col gap-1.5 md:gap-2">
                 <label htmlFor="lastName" className="text-sm text-gray-600">
@@ -119,6 +134,11 @@ const UserDetailsPage = () => {
                   text-black"
                   placeholder="Enter your last name"
                 />
+                {errors.lastName && (
+                  <p className="text-sm text-red-500 mt-1">
+                    {errors.lastName.message}
+                  </p>
+                )}
               </div>
 
               <div className="flex flex-col gap-1.5 md:gap-2">
@@ -130,7 +150,7 @@ const UserDetailsPage = () => {
                 </label>
                 <select
                   id="default_currency"
-                  {...register('default_currency')}
+                  {...register('default_currency_id')}
                   className="w-full p-2.5 md:p-3 border border-gray-300 rounded-md
                   focus:ring-2 focus:ring-indigo-500 focus:border-transparent
                   transition-all duration-200 placeholder:text-gray-400 
@@ -143,7 +163,7 @@ const UserDetailsPage = () => {
                     <>
                       <option value="">Select a currency</option>
                       {currencies.map((currency) => (
-                        <option key={currency.id} value={currency.code}>
+                        <option key={currency.id} value={currency.id}>
                           {currency.code} - {currency.name}
                         </option>
                       ))}
@@ -152,8 +172,10 @@ const UserDetailsPage = () => {
                 </select>
               </div>
 
-              {error && (
-                <div className="text-red-500 text-sm text-center">{error}</div>
+              {errors.default_currency_id && (
+                <p className="text-sm text-red-500 mt-1">
+                  {errors.default_currency_id.message}
+                </p>
               )}
 
               <Button
@@ -167,6 +189,9 @@ const UserDetailsPage = () => {
               >
                 {isLoading ? 'Saving...' : 'Save Details'}
               </Button>
+              {error && (
+                <div className="text-red-500 text-sm text-center">{error}</div>
+              )}
             </form>
           </div>
         </div>

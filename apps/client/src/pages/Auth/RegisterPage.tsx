@@ -10,13 +10,14 @@ import { useAuthStore } from '@/stores/authStores';
 import { type AxioError } from '@/types/stores.d';
 
 import { registerSchema, type RegisterSchema } from '../../lib/schema';
-import styles from '../Landing/LandingPage.module.css';
+import styles from '../landing/LandingPage.module.css';
 
 const RegisterPage = () => {
   const navigate = useNavigate();
   const [registerError, setRegisterError] = useState<string | null>(null);
   const [showPassword, setShowPassword] = useState(false);
-  const { isLoading, authRegister } = useAuthStore();
+  const { authRegister, defaultCurrencyId } = useAuthStore();
+  const [isLoading, setIsLoading] = useState(false);
   const {
     register,
     handleSubmit,
@@ -32,8 +33,13 @@ const RegisterPage = () => {
   const onSubmit = async (data: RegisterSchema) => {
     try {
       setRegisterError(null);
+      setIsLoading(true);
       await authRegister(data);
-      navigate('/user-details');
+      if (defaultCurrencyId) {
+        navigate('/overview');
+      } else {
+        navigate('/user-details');
+      }
     } catch (error: unknown) {
       if (error instanceof Error) {
         const errorMessage =
@@ -41,9 +47,10 @@ const RegisterPage = () => {
           error.message ||
           'An unexpected error occurred.';
         setRegisterError(errorMessage);
-        throw new Error(errorMessage);
       }
       throw error;
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -126,7 +133,7 @@ const RegisterPage = () => {
                   </button>
                 </div>
                 {errors.password && (
-                  <p className="text-xs text-red-500 mt-1">
+                  <p className="text-sm text-red-500 mt-1">
                     {errors.password.message}
                   </p>
                 )}
@@ -162,7 +169,7 @@ const RegisterPage = () => {
                   </button>
                 </div>
                 {errors.confirmPassword && (
-                  <p className="text-xs text-red-500 mt-1">
+                  <p className="text-sm text-red-500 mt-1">
                     {errors.confirmPassword.message}
                   </p>
                 )}

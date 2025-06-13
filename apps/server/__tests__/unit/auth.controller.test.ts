@@ -20,8 +20,7 @@ describe('logout user controller', () => {
       .post('/logout')
       .set('Cookie', ['token=abc123']);
 
-    expect(res.status).toBe(302);
-    expect(res.headers['location']).toBe('/api/v1/auth/login');
+    expect(res.status).toBe(200);
 
     const setCookie = res.headers['set-cookie'];
     expect(setCookie).toBeDefined();

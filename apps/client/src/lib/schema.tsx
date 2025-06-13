@@ -35,16 +35,17 @@ export const loginSchema = z.object({
   password: z.string().min(1, { message: 'Password is required' }),
 });
 
-export const userDetailsForm = z.object({
+export const userDetailsFormSchema = z.object({
   firstName: z.string().min(1, { message: 'First name is required' }),
   lastName: z.string().min(1, { message: 'Last name is required' }),
-  default_currency: z
+  default_currency_id: z
     .string()
-    .min(1, { message: 'Default currency is required' }),
+    .transform((val) => Number(val))
+    .refine((val) => val !== 0, { message: 'Please select a valid currency.' }),
 });
 
 export type LoginFormData = z.infer<typeof loginSchema>;
 
 export type RegisterSchema = z.infer<typeof registerSchema>;
 
-export type UserDetailsForm = z.infer<typeof userDetailsForm>;
+export type UserDetailsForm = z.infer<typeof userDetailsFormSchema>;

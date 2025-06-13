@@ -1,57 +1,65 @@
-import { Home, CircleDollarSign, ArrowLeftRight, LogOut } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import { Home, CircleDollarSign, ArrowLeftRight } from 'lucide-react';
+import { useNavigate, useLocation } from 'react-router-dom';
 
 import { cn } from '@/lib/utils';
-interface MobileNavItem {
+
+interface NavItem {
   id: string;
   label: string;
   icon: React.ComponentType<{ className?: string }>;
+  path: string;
 }
 
-interface MobileNavProps {
-  activeTab: string;
-  onTabChange: (tab: string) => void;
-}
-
-const mobileNavItems: MobileNavItem[] = [
-  { id: 'dashboard', label: 'Overview', icon: Home },
-  { id: 'transactions', label: 'Transactions', icon: ArrowLeftRight },
-  { id: 'budgets', label: 'Budgets', icon: CircleDollarSign },
-  { id: 'logout', label: 'Logout', icon: LogOut },
+const navItems: NavItem[] = [
+  {
+    id: 'dashboard',
+    label: 'Overview',
+    icon: Home,
+    path: '/overview',
+  },
+  {
+    id: 'transactions',
+    label: 'Transactions',
+    icon: ArrowLeftRight,
+    path: '/transactions',
+  },
+  {
+    id: 'budgets',
+    label: 'Budgets',
+    icon: CircleDollarSign,
+    path: '/budgets',
+  },
 ];
 
-const MobileNav: React.FC<MobileNavProps> = ({ activeTab, onTabChange }) => {
+const MobileNav: React.FC = () => {
   const navigate = useNavigate();
+  const location = useLocation();
+
+  // Extract current tab from URL path
+  const currentPath = location.pathname;
+  const activeTab =
+    navItems.find((item) => currentPath.startsWith(item.path))?.id || 'budgets';
+
+  const handleNavigation = (path: string) => {
+    navigate(path);
+  };
+
   return (
-    <div className="md:hidden fixed bottom-0 left-0 right-0 bg-Gray-900 rounded-t-lg border-t border-[#333333] z-50  ">
-      <div className="flex justify-around items-center pt-2 ">
-        {mobileNavItems.map((item) => (
+    <div className="md:hidden fixed bottom-0 left-0 right-0 bg-Gray-900 border-t border-gray-700">
+      <div className="flex justify-around py-2">
+        {navItems.map((item) => (
           <button
             key={item.id}
-            onClick={
-              item.id === 'logout'
-                ? () => navigate('/')
-                : () => onTabChange(item.id)
-            }
+            onClick={() => handleNavigation(item.path)}
             className={cn(
-              'flex flex-col items-center py-2 px-3 transition-colors rounded-t-sm min-w-[20%] cursor-pointer',
-              item.id !== 'logout' && activeTab === item.id
-                ? 'bg-Beige-100 text-Gray-900 border-b-2 border-b-Green'
-                : 'text-Gray-300 hover:bg-[#333333] hover:text-white',
-              item.id === 'logout' ? 'hover:text-Red' : '',
+              'flex flex-col items-center py-2 px-4 transition-colors',
+              activeTab === item.id
+                ? 'text-Green'
+                : 'text-Gray-300 hover:text-white',
             )}
           >
-            <item.icon
-              className={cn(
-                'w-5 h-5 mb-1',
-                item.id === 'logout'
-                  ? 'hover:text-Red'
-                  : activeTab === item.id
-                    ? 'text-Green'
-                    : 'text-Gray-300',
-              )}
-            />
-            <span className="text-xs font-medium">{item.label}</span>
+            <item.icon className="w-6 h-6 mb-1" />
+            <span className="text-xs">{item.label}</span>
           </button>
         ))}
       </div>

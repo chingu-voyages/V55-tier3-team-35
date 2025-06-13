@@ -3,7 +3,7 @@ import { create } from 'zustand';
 import { capitalize } from '@/lib/utils';
 import type { Budget, BudgetFormData } from '@/types/budget.types';
 
-import { post, patch, del, get as apiGet } from '../api/api';
+import { POST, PATCH, GET as apiGet, DEL } from '../api/api';
 
 const mockBudgets: Budget[] = [
   {
@@ -115,7 +115,7 @@ export const useBudgetStore = create<BudgetStore>((set, get) => ({
     });
 
     try {
-      const savedBudget = await post('/budgets', budgetData);
+      const savedBudget = await POST('/budgets', budgetData);
 
       set((state) => ({
         budgets: state.budgets.map((budget) =>
@@ -167,7 +167,7 @@ export const useBudgetStore = create<BudgetStore>((set, get) => ({
     });
 
     try {
-      await patch(`/budgets/${id}`, {
+      await PATCH(`/budgets/${id}`, {
         ...updates,
         spending: updates.spending ? newSpending : undefined,
       });
@@ -191,7 +191,7 @@ export const useBudgetStore = create<BudgetStore>((set, get) => ({
     });
 
     try {
-      await del(`/budgets/${id}`);
+      await DEL(`/budgets/${id}`);
     } catch (error) {
       console.error('Failed to delete budget:', error);
       set({ error: 'Failed to delete budget' });
