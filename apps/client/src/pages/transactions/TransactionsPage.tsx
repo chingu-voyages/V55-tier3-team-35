@@ -1,9 +1,12 @@
 import { Plus } from 'lucide-react';
 import { useEffect, useState } from 'react';
+import { Navigate } from 'react-router-dom';
 
+import TransactionPageSkeleton from '@/components/skeleton/transactionSkeleton';
 import { Button } from '@/components/ui/button';
 import TransactionFormModal from '@/components/ui/transactions/TransactionFormModal';
 import type { Transaction } from '@/schemas/transactionFormSchema';
+import { useAuthStore } from '@/stores/authStores';
 import { useCategoryStore } from '@/stores/categoryStore';
 import { useTransactionStore } from '@/stores/transactionStore';
 
@@ -39,7 +42,16 @@ const TransactionPage = () => {
     fetchTransactions();
   };
 
-  const isLoading = isLoadingCategories || isLoadingTransactions;
+  const { isLoading, isAuthenticated } = useAuthStore();
+
+  const loading = isLoadingCategories || isLoadingTransactions || isLoading;
+
+  if (loading) {
+    return <TransactionPageSkeleton />;
+  }
+  if (!isAuthenticated) {
+    return <Navigate to="/login" replace />;
+  }
 
   return (
     <div className="min-h-screen bg-gray-50 p-4">
@@ -50,7 +62,7 @@ const TransactionPage = () => {
             <h1 className="text-3xl font-bold text-gray-900">Transactions</h1>
             <Button
               onClick={handleOpenCreateModal}
-              disabled={isLoading}
+              disabled={loading}
               className="flex items-center gap-2 px-4 py-2 bg-indigo-600 hover:bg-indigo-700 
                 text-white font-medium rounded-md transition-colors duration-200
                 disabled:opacity-50 disabled:cursor-not-allowed"
@@ -59,8 +71,6 @@ const TransactionPage = () => {
               Add Transaction
             </Button>
           </div>
-
-          {isLoading && <div className="text-gray-600">Loading data...</div>}
         </div>
 
         {/* Transaction List */}

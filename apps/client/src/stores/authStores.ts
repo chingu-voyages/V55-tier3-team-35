@@ -40,6 +40,8 @@ export const useAuthStore = create<AuthState>()((set) => ({
     } catch (error: unknown) {
       set({ isLoading: false, isAuthenticated: false });
       throw error;
+    } finally {
+      set({ isLoading: false });
     }
   },
 
@@ -66,10 +68,13 @@ export const useAuthStore = create<AuthState>()((set) => ({
     } catch (error: unknown) {
       set({ isLoading: false, isAuthenticated: false });
       throw error;
+    } finally {
+      set({ isLoading: false });
     }
   },
 
   checkAuth: async () => {
+    set({ isLoading: true });
     try {
       const response = await GET(AUTH_ENDPOINTS.CHECK_STATUS);
       set({
@@ -85,6 +90,8 @@ export const useAuthStore = create<AuthState>()((set) => ({
         isLoading: false,
       });
       console.error('User is not authenticated', error);
+    } finally {
+      set({ isLoading: false });
     }
   },
 

@@ -1,5 +1,6 @@
 import { Routes, Route, Navigate } from 'react-router-dom';
 
+import Error from '../src/error';
 import BudgetsPage from './components/dashboard/tabs/budgets.tsx';
 import ProtectedRoute from './components/general/protectedRoute.tsx';
 import LoginPage from './pages/Auth/LoginPage';
@@ -50,9 +51,10 @@ function App() {
           </ProtectedRoute>
         }
       />
+      <Route path="/not-found" element={<Error />} />
 
       {/* Catch all route */}
-      <Route path="*" element={<Navigate to="/" replace />} />
+      <Route path="*" element={<Navigate to="/not-found" replace />} />
     </Routes>
   );
 }

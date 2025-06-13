@@ -6,7 +6,7 @@ import { describe, it, expect } from 'vitest';
 import createApp from '../../src/app/createApp';
 import { logOutUser } from '../../src/controllers/auth.controller';
 
-const mockRequireAuth = (req: Request, res: Response, next: NextFunction) => {
+const mockRequireAuth = (_: Request, __: Response, next: NextFunction) => {
   next();
 };
 

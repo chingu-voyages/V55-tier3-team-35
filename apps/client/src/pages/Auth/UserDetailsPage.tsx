@@ -7,6 +7,7 @@ import { Link } from 'react-router-dom';
 
 import { GET } from '@/api/api';
 import { CURRENCY_ENDPOINTS } from '@/api/constants';
+import Spinner from '@/components/general/spinner';
 import { Button } from '@/components/ui/button';
 import { userDetailsFormSchema, type UserDetailsForm } from '@/lib/schema';
 import { useAuthStore } from '@/stores/authStores';
@@ -187,6 +188,7 @@ const UserDetailsPage = () => {
                 transition-colors duration-200 shadow-sm
                 disabled:opacity-50 disabled:cursor-not-allowed"
               >
+                {isLoading && <Spinner></Spinner>}
                 {isLoading ? 'Saving...' : 'Save Details'}
               </Button>
               {error && (
