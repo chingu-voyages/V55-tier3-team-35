@@ -40,8 +40,6 @@ export const useAuthStore = create<AuthState>()((set) => ({
     } catch (error: unknown) {
       set({ isLoading: false, isAuthenticated: false });
       throw error;
-    } finally {
-      set({ isLoading: false });
     }
   },
 
@@ -68,8 +66,6 @@ export const useAuthStore = create<AuthState>()((set) => ({
     } catch (error: unknown) {
       set({ isLoading: false, isAuthenticated: false });
       throw error;
-    } finally {
-      set({ isLoading: false });
     }
   },
 

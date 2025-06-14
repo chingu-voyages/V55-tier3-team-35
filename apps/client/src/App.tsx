@@ -1,8 +1,8 @@
 import { Routes, Route, Navigate } from 'react-router-dom';
 
-import Error from '../src/error';
 import BudgetsPage from './components/dashboard/tabs/budgets.tsx';
 import ProtectedRoute from './components/general/protectedRoute.tsx';
+import Error from './error';
 import LoginPage from './pages/Auth/LoginPage';
 import RegisterPage from './pages/Auth/RegisterPage';
 import UserDetailsPage from './pages/Auth/UserDetailsPage';
