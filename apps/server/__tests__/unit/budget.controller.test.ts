@@ -53,7 +53,7 @@ describe('budget controller', () => {
     const response = await request(app).post(TEST_END_POINT).send(requestData);
 
     expect(response.status).toBe(201);
-    expect(response.body.message).toBe('Transaction created successfully');
+    expect(response.body.message).toBe('Budget created successfully');
     expect(budgetService.createBudget).toHaveBeenCalledExactlyOnceWith(
       requestData,
     );
