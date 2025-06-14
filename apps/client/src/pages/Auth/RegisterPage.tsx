@@ -5,6 +5,7 @@ import { useForm } from 'react-hook-form';
 import { useNavigate } from 'react-router-dom';
 import { Link } from 'react-router-dom';
 
+import Spinner from '@/components/general/spinner';
 import { Button } from '@/components/ui/button';
 import { useAuthStore } from '@/stores/authStores';
 import { type AxioError } from '@/types/stores.d';
@@ -190,6 +191,7 @@ const RegisterPage = () => {
                 transition-colors duration-200 shadow-sm
                 disabled:opacity-50 disabled:cursor-not-allowed"
               >
+                {isLoading && <Spinner></Spinner>}
                 {isLoading ? 'Creating Account...' : 'Register'}
               </Button>
 

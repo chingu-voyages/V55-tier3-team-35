@@ -70,6 +70,7 @@ export const useAuthStore = create<AuthState>()((set) => ({
   },
 
   checkAuth: async () => {
+    set({ isLoading: true });
     try {
       const response = await GET(AUTH_ENDPOINTS.CHECK_STATUS);
       set({
@@ -85,6 +86,8 @@ export const useAuthStore = create<AuthState>()((set) => ({
         isLoading: false,
       });
       console.error('User is not authenticated', error);
+    } finally {
+      set({ isLoading: false });
     }
   },
 

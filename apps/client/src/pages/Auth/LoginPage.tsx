@@ -3,6 +3,7 @@ import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { Link, useNavigate } from 'react-router-dom';
 
+import Spinner from '@/components/general/spinner';
 import { Button } from '@/components/ui/button';
 import { useAuthStore } from '@/stores/authStores';
 import { type AxioError } from '@/types/stores.d';
@@ -144,6 +145,7 @@ const LoginPage = () => {
                 transition-colors duration-200 shadow-sm
                 disabled:opacity-50 disabled:cursor-not-allowed"
               >
+                {isLoading && <Spinner></Spinner>}
                 {isLoading ? 'Logging in...' : 'Login'}
               </Button>
 
