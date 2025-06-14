@@ -1,6 +1,7 @@
 import prisma from '../database/db';
 import type {
   createTransactionInput,
+  updateTransactionInput,
   Transaction,
 } from '../schemas/transactionSchema';
 
@@ -12,20 +13,33 @@ export const transactionService = {
       data: transactionData,
     });
   },
-  async getAllTransactions(userId: number): Promise<Transaction[]> {
-    return await prisma.transactions.findMany({
+
+  async getTransactions(id: number): Promise<Transaction[]> {
+    return prisma.transactions.findMany({
       where: {
-        user_id: userId,
+        user_id: id,
       },
+      orderBy: [{ id: 'desc' }],
     });
   },
-  async updateTransaction(transaction: Transaction): Promise<Transaction> {
-    const { id, ...data } = transaction;
-    return await prisma.transactions.update({
+
+  async updateTransaction(
+    transactionId: number,
+    updateData: updateTransactionInput,
+  ): Promise<Transaction> {
+    return prisma.transactions.update({
       where: {
-        id: id,
+        id: transactionId,
       },
-      data,
+      data: updateData,
+    });
+  },
+
+  async deleteTransaction(transactionId: number): Promise<Transaction> {
+    return prisma.transactions.delete({
+      where: {
+        id: transactionId,
+      },
     });
   },
 };

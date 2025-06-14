@@ -5,10 +5,12 @@ import type { Params } from '../schemas/paramsSchema';
 import { transactionService } from '../services/transaction.service';
 import {
   createTransactionSchema,
-  transactionSchema,
+  getTransactionsSchema,
+  updateTransactionBodySchema,
+  transactionIdSchema,
 } from './../schemas/transactionSchema';
 
-export const createTransaction = async (
+const createTransaction = async (
   req: Request,
   res: Response,
   next: NextFunction,
@@ -40,60 +42,104 @@ export const createTransaction = async (
   }
 };
 
-export const getUserTransactions = async (
+const getTransactions = async (
   req: Request,
   res: Response,
   next: NextFunction,
-): Promise<void> => {
+) => {
+  const validationResult = getTransactionsSchema.safeParse(req.params);
   try {
-    const userIdString = req.params.id;
-    if (!userIdString) {
-      res.status(400).json({ error: 'User ID is required' });
+    if (!validationResult.success) {
+      res.status(400).json({
+        message: 'Invalid input',
+        error: validationResult.error.issues,
+      });
       return;
     }
-
-    const userId = parseInt(userIdString, 10);
-    if (isNaN(userId)) {
-      res.status(400).json({ error: 'Invalid user ID format' });
-      return;
-    }
-
-    const response = await transactionService.getAllTransactions(userId);
-    res.status(200).json({ data: response });
+    const response = await transactionService.getTransactions(
+      validationResult.data.id,
+    );
+    res
+      .status(200)
+      .json({ message: 'Transactions fetched successfully', data: response });
   } catch (err) {
     next(err);
   }
 };
 
-export const updateTransaction = async (
-  req: Request<Params>,
+const updateTransaction = async (
+  req: Request,
   res: Response,
   next: NextFunction,
-): Promise<void> => {
-  try {
-    const transactionIdString = req.params.id;
+) => {
+  const paramsValidation = transactionIdSchema.safeParse(req.params);
+  const bodyValidation = updateTransactionBodySchema.safeParse(req.body);
 
-    const transactionId = parseInt(transactionIdString, 10);
-    if (isNaN(transactionId)) {
-      res.status(400).json({ error: 'Invalid transaction ID format' });
-      return;
-    }
-    console.log(req.body);
-    const validationResult = transactionSchema.safeParse(req.body);
-    if (!validationResult.success) {
+  try {
+    if (!paramsValidation.success) {
       res.status(400).json({
-        message: 'Invalid input',
-        error: validationResult.error.format(),
+        message: 'Invalid parameters',
+        error: paramsValidation.error.issues,
       });
       return;
     }
 
-    const response = await transactionService.updateTransaction(
-      validationResult.data,
-    );
-    res.status(200).json({ data: response });
-  } catch (error) {
-    console.error('Error updating transaction:', error);
-    next(error);
+    if (!bodyValidation.success) {
+      if (env.NODE_ENV !== 'production') {
+        console.error('Zod Validation Error', bodyValidation.error.issues);
+      }
+      res.status(400).json({
+        message: 'Invalid input',
+        error:
+          env.NODE_ENV !== 'production'
+            ? bodyValidation.error.issues
+            : undefined,
+      });
+      return;
+    }
+
+    const { id } = paramsValidation.data;
+    const updateData = bodyValidation.data;
+
+    const response = await transactionService.updateTransaction(id, updateData);
+    res
+      .status(200)
+      .json({ message: 'Transaction updated successfully', data: response });
+  } catch (err) {
+    next(err);
   }
+};
+
+const deleteTransaction = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
+  const validationResult = transactionIdSchema.safeParse(req.params);
+
+  try {
+    if (!validationResult.success) {
+      res.status(400).json({
+        message: 'Invalid parameters',
+        error: validationResult.error.issues,
+      });
+      return;
+    }
+
+    const { id } = validationResult.data;
+
+    const response = await transactionService.deleteTransaction(id);
+    res
+      .status(200)
+      .json({ message: 'Transaction deleted successfully', data: response });
+  } catch (err) {
+    next(err);
+  }
+};
+
+export {
+  createTransaction,
+  getTransactions,
+  updateTransaction,
+  deleteTransaction,
 };
