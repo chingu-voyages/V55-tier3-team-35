@@ -31,13 +31,13 @@ export const CURRENCY_ENDPOINTS: CurrencyEndpoints = {
 export const TRANSACTION_ENDPOINTS: TransactionEndpoints = {
   CREATE: '/transactions',
   UPDATE: (transactionId) => `/transactions/${transactionId}`,
-  LIST_BY_USER: '/transactions',
+  LIST_BY_USER: (userId) => `/transactions/user/${userId}`,
   DELETE: (transactionId) => `/transactions/${transactionId}`,
 } as const;
 
 // Category Endpoints
 export const CATEGORY_ENDPOINTS: CategoryEndpoints = {
-  LIST_BY_USER: '/categories',
+  LIST_BY_USER: (userId: number) => `/categories/user/${userId}`,
 } as const;
 
 export const BUDGET_ENDPOINTS: BudgetEndpoints = {

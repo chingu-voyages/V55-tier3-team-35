@@ -18,14 +18,14 @@ export interface CurrencyEndpoints {
 }
 
 export interface TransactionEndpoints {
-  LIST_BY_USER: string;
+  LIST_BY_USER: (userId: number) => string;
   CREATE: string;
   UPDATE: (transactionId: string | number) => string;
   DELETE: (transactionId: string | number) => string;
 }
 
 export interface CategoryEndpoints {
-  LIST_BY_USER: string;
+  LIST_BY_USER: (userId: number) => string;
 }
 
 export interface BudgetEndpoints {
