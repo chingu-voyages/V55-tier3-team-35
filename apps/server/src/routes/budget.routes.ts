@@ -5,13 +5,15 @@ import {
   getAllBudgets, 
   updateBudget, 
   deleteBudget, 
+  getUserSpendings,
 } from './../controllers/budget.controller';
 
 const budgetRouter = Router();
 
 budgetRouter.post('/', createBudget);
-budgetRouter.get('/:userId', getAllBudgets);
-budgetRouter.patch('/:userId/:id', updateBudget);
-budgetRouter.delete('/:userId/:id', deleteBudget);
+budgetRouter.get('/user/:userId', getAllBudgets);
+budgetRouter.get('/user/:userId/spendings', getUserSpendings);
+budgetRouter.patch('/:id/user/:userId', updateBudget);
+budgetRouter.delete('/:id/user/:userId', deleteBudget);
 
 export default budgetRouter;

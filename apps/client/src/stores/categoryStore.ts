@@ -16,10 +16,11 @@ interface CategoryState {
   transactionTypes: TransactionType[];
   isLoadingCategories: boolean;
   error: string | null;
+  hasFetched: boolean;
   fetchCategories: () => Promise<void>;
 }
 
-export const useCategoryStore = create<CategoryState>()((set) => ({
+export const useCategoryStore = create<CategoryState>()((set, get) => ({
   categories: [],
   transactionTypes: [
     { id: 1, name: 'Income' },
@@ -27,10 +28,12 @@ export const useCategoryStore = create<CategoryState>()((set) => ({
   ],
   isLoadingCategories: false,
   error: null,
+  hasFetched: false,
 
   fetchCategories: async () => {
+
     const authState = useAuthStore.getState();
-    if (!authState.user.id) {
+    if (!authState.user?.id) {
       console.error('User ID not found in auth store');
       set({ error: 'User not authenticated!' });
       return;
@@ -41,10 +44,12 @@ export const useCategoryStore = create<CategoryState>()((set) => ({
       const response = await GET(
         `${CATEGORY_ENDPOINTS.LIST_BY_USER(authState.user.id)}`,
       );
+      console.log("Categories response:", response);
       const categoriesData = response.data;
       set({
         categories: categoriesData,
         isLoadingCategories: false,
+        hasFetched: true,
       });
     } catch (error) {
       console.error('Failed to fetch categories', error);

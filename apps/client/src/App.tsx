@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 
 import BudgetsPage from './components/dashboard/tabs/budgets.tsx';
@@ -9,8 +10,23 @@ import UserDetailsPage from './pages/Auth/UserDetailsPage';
 import HomePage from './pages/home/HomePage';
 import LandingPage from './pages/landing/LandingPage.tsx';
 import TransactionPage from './pages/transactions/TransactionsPage';
+import { useAuthStore } from './stores/authStores';
 
 function App() {
+  const { checkAuth, isLoading } = useAuthStore();
+
+  useEffect(() => {
+    checkAuth();
+  }, [checkAuth]);
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="text-lg">Loading...</div>
+      </div>
+    );
+  }
+
   return (
     <Routes>
       {/* Public routes */}

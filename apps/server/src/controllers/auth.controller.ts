@@ -1,11 +1,17 @@
-import { Prisma } from '@prisma/client';
-import bcrypt from 'bcrypt';
+  import bcrypt from 'bcrypt';
 import type { NextFunction, Request, Response } from 'express';
 import jwt, { type JwtPayload } from 'jsonwebtoken';
 
 import { prisma } from '../database/db';
 import { env } from '../schemas/env';
 import { registerSchema } from '../schemas/registerSchema';
+
+interface CategoryTemplate {
+  id: number;
+  name: string;
+  created_at: Date;
+  updated_at: Date;
+}
 
 export const registerUser = async (
   req: Request,
@@ -34,7 +40,7 @@ export const registerUser = async (
     }
 
     const saltRounds = 10;
-    const password_hash = await bcrypt.hash(password, saltRounds); // hash the password saltRound number of times
+    const password_hash = await bcrypt.hash(password, saltRounds);
 
     const newUser = await prisma.users.create({
       data: {
@@ -48,11 +54,13 @@ export const registerUser = async (
         default_currency_id: true,
       },
     });
+
     const templateCategories = await prisma.category_templates.findMany();
     if (!templateCategories.length) {
       throw new Error('No template categories found.');
     }
-    const userCategoryData = templateCategories.map((template) => ({
+
+    const userCategoryData = templateCategories.map((template: CategoryTemplate) => ({
       name: template.name,
       is_user_created: false,
       user_id: newUser.id,
@@ -67,7 +75,7 @@ export const registerUser = async (
         `Expected to create ${templateCategories.length} categories, but only created ${createdCategories.count}`,
       );
     }
-    // Generate JWT token for the newly registered user
+
     const token = jwt.sign(
       {
         userId: newUser.id,
@@ -78,18 +86,12 @@ export const registerUser = async (
         expiresIn: '48h',
       },
     );
+
     res.cookie('token', token, {
       httpOnly: true,
       secure: env.NODE_ENV === 'production',
       sameSite: process.env.CLIENT_HOST === 'ALLOW_ALL' ? 'none' : 'strict',
       maxAge: 48 * 60 * 60 * 1000,
-    });
-
-    res.cookie('token', token, {
-      httpOnly: true,
-      secure: env.NODE_ENV === 'production',
-      sameSite: 'strict',
-      maxAge: 48 * 60 * 60 * 1000, // 48 hours
     });
 
     res.status(201).json({
@@ -99,15 +101,13 @@ export const registerUser = async (
         username: newUser.username,
       },
     });
-  } catch (err) {
-    if (err instanceof Prisma.PrismaClientKnownRequestError) {
-      if (err.code === 'P2002') {
-        res.status(409).json({
-          message: 'Username already taken',
-          error: 'Unique constraint violation',
-        });
-        return;
-      }
+  } catch (err: unknown) {
+    if (err instanceof Error && 'code' in err && err.code === 'P2002') {
+      res.status(409).json({
+        message: 'Username already taken',
+        error: 'Unique constraint violation',
+      });
+      return;
     }
     console.error('Unexpected error occurred', err);
     next(err);
@@ -121,13 +121,11 @@ export const logInUser = async (
 ): Promise<void> => {
   try {
     const { username, password } = req.body;
-    // Input validation
     if (!username || !password) {
       res.status(400).json({ message: 'Username and password are required.' });
       return;
     }
 
-    // Look up user by username
     const user = await prisma.users.findUnique({
       where: { username },
       select: {
@@ -150,7 +148,6 @@ export const logInUser = async (
       return;
     }
 
-    // Set JWT Token in cookie
     const token = jwt.sign(
       {
         userId: user.id,
@@ -165,7 +162,7 @@ export const logInUser = async (
     res.cookie('token', token, {
       httpOnly: true,
       secure: env.NODE_ENV === 'production',
-      sameSite: process.env.CLIENT_HOST === 'ALLOW_ALL' ? 'none' : 'strict',
+      sameSite: env.NODE_ENV === 'production' ? 'strict' : 'lax',
       maxAge: 48 * 60 * 60 * 1000,
     });
 
@@ -185,8 +182,8 @@ export const logInUser = async (
 export const logOutUser = (_: Request, res: Response): void => {
   res.clearCookie('token', {
     httpOnly: true,
-    sameSite: process.env.CLIENT_HOST === 'ALLOW_ALL' ? 'none' : 'strict',
     secure: env.NODE_ENV === 'production',
+    sameSite: env.NODE_ENV === 'production' ? 'strict' : 'lax',
   });
   console.log('User logged out successfully');
   res.status(200).json({ message: 'Logged out' });
@@ -198,7 +195,7 @@ export const checkAuthStatus = async (
   next: NextFunction,
 ): Promise<void> => {
   try {
-    // Extract token from cookie
+
     const token = req.cookies?.token;
 
     if (!token) {
@@ -209,7 +206,6 @@ export const checkAuthStatus = async (
       return;
     }
 
-    // Verify JWT token
     let decoded: JwtPayload;
     try {
       decoded = jwt.verify(token, env.JWT_SECRET as string) as JwtPayload;
@@ -222,7 +218,6 @@ export const checkAuthStatus = async (
       return;
     }
 
-    // Fetch user data from database to ensure user still exists
     const user = await prisma.users.findUnique({
       where: { id: decoded.userId },
       select: {
@@ -234,7 +229,6 @@ export const checkAuthStatus = async (
     });
 
     if (!user) {
-      // User no longer exists in database
       res.status(401).json({
         message: 'User account not found.',
         isAuthenticated: false,
@@ -255,7 +249,6 @@ export const checkAuthStatus = async (
       });
     }
 
-    // Authentication successful - return user data
     res.status(200).json({
       message: 'Authentication valid.',
       isAuthenticated: true,

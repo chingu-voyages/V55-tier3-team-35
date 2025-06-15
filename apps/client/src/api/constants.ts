@@ -38,3 +38,11 @@ export const TRANSACTION_ENDPOINTS: TransactionEndpoints = {
 export const CATEGORY_ENDPOINTS: CategoryEndpoints = {
   LIST_BY_USER: (userId) => `categories/user/${userId}`,
 } as const;
+
+export const BUDGET_ENDPOINTS = {
+  CREATE: '/budgets',
+  LIST_BY_USER: (userId: number) => `/budgets/user/${userId}`,
+  UPDATE: (budgetId: number, userId: number) => `/budgets/${budgetId}/user/${userId}`,
+  DELETE: (budgetId: number, userId: number) => `/budgets/${budgetId}/user/${userId}`,
+  GET_USER_SPENDING: (userId: number) => `/budgets/user/${userId}/spendings`,
+} as const;
