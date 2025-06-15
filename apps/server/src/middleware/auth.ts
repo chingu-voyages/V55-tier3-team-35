@@ -23,7 +23,7 @@ const requireAuth = (req: Request, res: Response, next: NextFunction): void => {
     }
 
     req.user = {
-      userId: decoded.userId,
+      id: decoded.userId,
       username: decoded.username,
       iat: decoded.iat,
       exp: decoded.exp,

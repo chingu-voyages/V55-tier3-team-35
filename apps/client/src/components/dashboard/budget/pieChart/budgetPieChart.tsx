@@ -36,9 +36,6 @@ const BudgetPieChart: React.FC = () => {
             <div className="text-3xl font-bold text-Gray-900">
               ${state.totalSpending.toFixed(2)}
             </div>
-            <div className="text-sm text-Gray-500">
-              of ${state.totalMaximum.toFixed(2)} limit
-            </div>
           </div>
         </div>
       </div>

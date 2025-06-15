@@ -1,9 +1,8 @@
 import { create } from 'zustand';
 
+import { DEL, GET } from '@/api/api';
 import { TRANSACTION_ENDPOINTS } from '@/api/constants';
 import type { Transaction } from '@/schemas/transactionFormSchema';
-
-import { GET } from './../api/api';
 import { useAuthStore } from './authStores';
 
 interface TransactionState {
@@ -13,7 +12,7 @@ interface TransactionState {
   addTransaction: (transaction: Transaction) => void;
   fetchTransactions: () => Promise<void>;
   updateTransaction: (id: number, transaction: Transaction) => void;
-  removeTransaction: (id: number) => void;
+  deleteTransaction: (id: number) => Promise<void>;
 }
 
 export const useTransactionStore = create<TransactionState>()((set, get) => ({
@@ -38,9 +37,7 @@ export const useTransactionStore = create<TransactionState>()((set, get) => ({
     set({ isLoadingTransactions: true, error: null });
 
     try {
-      const response = await GET(
-        TRANSACTION_ENDPOINTS.LIST_BY_USER(authState.user.id),
-      );
+      const response = await GET(TRANSACTION_ENDPOINTS.LIST_BY_USER(authState.user.id));
       const transactionData = response.data;
       console.log(`transaction data received from Backend: ${transactionData}`);
       set({
@@ -62,7 +59,28 @@ export const useTransactionStore = create<TransactionState>()((set, get) => ({
     );
   },
 
-  removeTransaction: async (id: number) => {
-    console.log(`This action will remove a transaction with ID of ${id}`);
+  deleteTransaction: async (id: number) => {
+    const authState = useAuthStore.getState();
+    if (!authState.user?.id) {
+      console.error('User ID not found in auth store');
+      set({ error: 'User not authenticated' });
+      return;
+    }
+
+    const currentTransactions = get().transactions;
+    
+    set({
+      transactions: currentTransactions.filter(t => t.id !== id),
+    });
+
+    try {
+      await DEL(TRANSACTION_ENDPOINTS.DELETE(id));
+    } catch (error) {
+      console.error('Failed to delete transaction:', error);
+      set({
+        transactions: currentTransactions,
+        error: 'Failed to delete transaction',
+      });
+    }
   },
 }));

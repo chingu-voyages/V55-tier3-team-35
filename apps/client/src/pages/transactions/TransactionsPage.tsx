@@ -1,9 +1,16 @@
-import { Plus } from 'lucide-react';
+import { MoreHorizontal, Plus } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { Navigate } from 'react-router-dom';
 
 import TransactionPageSkeleton from '@/components/skeleton/transactionSkeleton';
 import { Button } from '@/components/ui/button';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
+import DeleteTransactionDialog from '@/components/ui/transactions/DeleteTransactionDialog';
 import TransactionFormModal from '@/components/ui/transactions/TransactionFormModal';
 import type { Transaction } from '@/schemas/transactionFormSchema';
 import { useAuthStore } from '@/stores/authStores';
@@ -15,9 +22,12 @@ const TransactionPage = () => {
   const [editingTransaction, setEditingTransaction] = useState<
     Transaction | undefined
   >();
-  const { fetchCategories, isLoadingCategories } = useCategoryStore();
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [selectedTransaction, setSelectedTransaction] = useState<Transaction | null>(null);
+  const { fetchCategories, isLoadingCategories, categories } = useCategoryStore();
   const { transactions, isLoadingTransactions, fetchTransactions } =
     useTransactionStore();
+
   useEffect(() => {
     fetchCategories();
     fetchTransactions();
@@ -31,6 +41,11 @@ const TransactionPage = () => {
   const handleOpenEditModal = (transaction: Transaction) => {
     setIsModalOpen(true);
     setEditingTransaction(transaction);
+  };
+
+  const handleOpenDeleteDialog = (transaction: Transaction) => {
+    setSelectedTransaction(transaction);
+    setDeleteDialogOpen(true);
   };
 
   const handleCloseModal = () => {
@@ -98,6 +113,9 @@ const TransactionPage = () => {
                       Date
                     </th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Type
+                    </th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                       Actions
                     </th>
                   </tr>
@@ -112,6 +130,14 @@ const TransactionPage = () => {
                         ${parseFloat(transaction.amount).toFixed(2)}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
+                        {categories.find(category => category.id === transaction.category_id)?.name}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                        {new Date(
+                          transaction.transaction_date,
+                        ).toLocaleDateString()}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
                         <span
                           className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
                             transaction.transaction_type_id === 1
@@ -124,18 +150,31 @@ const TransactionPage = () => {
                             : 'Expense'}
                         </span>
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                        {new Date(
-                          transaction.transaction_date,
-                        ).toLocaleDateString()}
-                      </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                        <button
-                          onClick={() => handleOpenEditModal(transaction)}
-                          className="text-indigo-600 hover:text-indigo-900 transition-colors"
-                        >
-                          Edit
-                        </button>
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Button variant="ghost" size="icon" className="h-6 w-6">
+                              <MoreHorizontal className="w-4 h-4 text-Gray-500" />
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent
+                            align="end"
+                            className="bg-white border border-Gray-300 shadow-lg"
+                          >
+                            <DropdownMenuItem
+                              onClick={() => handleOpenEditModal(transaction)}
+                              className="px-4 py-2 text-Gray-700 hover:bg-Gray-100 cursor-pointer"
+                            >
+                              Edit Transaction
+                            </DropdownMenuItem>
+                            <DropdownMenuItem
+                              onClick={() => handleOpenDeleteDialog(transaction)}
+                              className="cursor-pointer hover:bg-Gray-100 text-Red"
+                            >
+                              Delete Transaction
+                            </DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
                       </td>
                     </tr>
                   ))}
@@ -151,6 +190,13 @@ const TransactionPage = () => {
           existingTransaction={editingTransaction}
           onSuccess={handleTransactionSuccess}
         />
+        {selectedTransaction && (
+          <DeleteTransactionDialog
+            transaction={selectedTransaction}
+            open={deleteDialogOpen}
+            onOpenChange={setDeleteDialogOpen}
+          />
+        )}
       </div>
     </div>
   );
