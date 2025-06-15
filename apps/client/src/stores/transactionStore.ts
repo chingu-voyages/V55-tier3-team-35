@@ -37,9 +37,7 @@ export const useTransactionStore = create<TransactionState>()((set, get) => ({
     set({ isLoadingTransactions: true, error: null });
 
     try {
-      const response = await GET(
-        TRANSACTION_ENDPOINTS.LIST_BY_USER(authState.user.id),
-      );
+      const response = await GET(TRANSACTION_ENDPOINTS.LIST_BY_USER);
       const transactionData = response.data;
       console.log(`transaction data received from Backend: ${transactionData}`);
       set({
