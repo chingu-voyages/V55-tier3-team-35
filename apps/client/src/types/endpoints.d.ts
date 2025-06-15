@@ -18,12 +18,20 @@ export interface CurrencyEndpoints {
 }
 
 export interface TransactionEndpoints {
-  LIST_BY_USER: (userId: string | number) => string;
+  LIST_BY_USER: string;
   CREATE: string;
-  UPDATE: (userId: string | number) => string;
-  DELETE: (userId: string | number) => string;
+  UPDATE: (transactionId: string | number) => string;
+  DELETE: (transactionId: string | number) => string;
 }
 
 export interface CategoryEndpoints {
-  LIST_BY_USER: (userId: string | number) => string;
+  LIST_BY_USER: string;
+}
+
+export interface BudgetEndpoints {
+  CREATE: string;
+  LIST_BY_USER: (userId: number) => string;
+  UPDATE: (budgetId: number, userId: number) => string;
+  DELETE: (budgetId: number, userId: number) => string;
+  GET_USER_SPENDING: (userId: number) => string;
 }

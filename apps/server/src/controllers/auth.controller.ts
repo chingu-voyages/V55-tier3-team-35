@@ -162,7 +162,7 @@ export const logInUser = async (
     res.cookie('token', token, {
       httpOnly: true,
       secure: env.NODE_ENV === 'production',
-      sameSite: env.NODE_ENV === 'production' ? 'none' : 'lax',
+      sameSite: env.NODE_ENV === 'production' ? 'strict' : 'lax',
       maxAge: 48 * 60 * 60 * 1000,
     });
 
@@ -183,7 +183,7 @@ export const logOutUser = (_: Request, res: Response): void => {
   res.clearCookie('token', {
     httpOnly: true,
     secure: env.NODE_ENV === 'production',
-    sameSite: env.NODE_ENV === 'production' ? 'none' : 'lax',
+    sameSite: env.NODE_ENV === 'production' ? 'strict' : 'lax',
   });
   console.log('User logged out successfully');
   res.status(200).json({ message: 'Logged out' });

@@ -1,13 +1,14 @@
 import { env } from '../schemas/env';
 
 export const corsOptions = {
-  origin: process.env.CLIENT_HOST === 'ALLOW_ALL' 
-    ? true 
-    : process.env.CLIENT_HOST 
-      ? [process.env.CLIENT_HOST] 
-      : ['http://localhost:5173'],
+  origin:
+    env.NODE_ENV !== 'production' ||
+    process.env.CLIENT_HOST === 'ALLOW_ALL' ||
+    !process.env.CLIENT_HOST
+      ? true
+      : [process.env.CLIENT_HOST].filter((host): host is string =>
+          Boolean(host),
+        ),
   credentials: true,
   optionsSuccessStatus: 200,
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization'],
 };

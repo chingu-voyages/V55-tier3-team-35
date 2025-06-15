@@ -4,6 +4,7 @@ import type {
   CurrencyEndpoints,
   CategoryEndpoints,
   TransactionEndpoints,
+  BudgetEndpoints,
 } from '@/types/endpoints';
 
 // Authentication Endpoints
@@ -29,17 +30,17 @@ export const CURRENCY_ENDPOINTS: CurrencyEndpoints = {
 // Transaction Endpoints
 export const TRANSACTION_ENDPOINTS: TransactionEndpoints = {
   CREATE: '/transactions',
-  UPDATE: (transactionId) => `transactions/${transactionId}`,
-  LIST_BY_USER: (userId) => `transactions/user/${userId}`,
-  DELETE: (transactionId) => `transactions/${transactionId}`,
+  UPDATE: (transactionId) => `/transactions/${transactionId}`,
+  LIST_BY_USER: '/transactions',
+  DELETE: (transactionId) => `/transactions/${transactionId}`,
 } as const;
 
 // Category Endpoints
 export const CATEGORY_ENDPOINTS: CategoryEndpoints = {
-  LIST_BY_USER: (userId) => `categories/user/${userId}`,
+  LIST_BY_USER: '/categories',
 } as const;
 
-export const BUDGET_ENDPOINTS = {
+export const BUDGET_ENDPOINTS: BudgetEndpoints = {
   CREATE: '/budgets',
   LIST_BY_USER: (userId: number) => `/budgets/user/${userId}`,
   UPDATE: (budgetId: number, userId: number) => `/budgets/${budgetId}/user/${userId}`,
