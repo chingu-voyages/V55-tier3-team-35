@@ -20,7 +20,7 @@ interface CategoryState {
   fetchCategories: () => Promise<void>;
 }
 
-export const useCategoryStore = create<CategoryState>()((set, get) => ({
+export const useCategoryStore = create<CategoryState>()((set) => ({
   categories: [],
   transactionTypes: [
     { id: 1, name: 'Income' },
@@ -31,7 +31,6 @@ export const useCategoryStore = create<CategoryState>()((set, get) => ({
   hasFetched: false,
 
   fetchCategories: async () => {
-
     const authState = useAuthStore.getState();
     if (!authState.user?.id) {
       console.error('User ID not found in auth store');

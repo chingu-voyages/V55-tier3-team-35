@@ -1,6 +1,5 @@
 import { create } from 'zustand';
 
-import { capitalize } from '@/lib/utils';
 import { CATEGORY_THEME_MAP, CATEGORY_OPTIONS } from '@/constants/budgetOptions';
 import type { Budget, BudgetFormData } from '@/types/budget.types';
 import { useAuthStore } from '@/stores/authStores';
