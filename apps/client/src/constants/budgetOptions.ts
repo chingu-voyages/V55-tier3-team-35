@@ -28,6 +28,27 @@ export const CATEGORY_OPTIONS: CategoryOption[] = [
   { value: 'education', label: 'Education' },
 ];
 
+
+export const CATEGORY_THEME_MAP: Record<string, string> = {
+  entertainment: 'Magenta',
+  bills: 'Blue',
+  dining: 'Orange',
+  personal: 'Turquoise',
+  shopping: 'Gold',
+  transportation: 'Navy',
+  groceries: 'Green',
+  health: 'Cyan',
+  travel: 'Yellow',
+  education: 'Brown',
+  rent: 'NavyGrey',
+  mortgage: 'ArmyGreen',
+  utilities: 'Gold',
+  internet: 'Orange',
+  phone: 'Turquoise',
+  cable: 'Navy',
+  insurance: 'Green',
+};
+
 export const FORM_VALIDATION = {
   category: {
     required: 'Budget category is required',

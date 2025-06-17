@@ -125,3 +125,43 @@ export const deleteBudget = async (
     next(err);
   }
 };
+
+export const getUserSpendings = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+): Promise<void> => {
+  try {
+    const { userId: userIdString } = req.params;
+    const { year: yearString, month: monthString } = req.query;
+
+    if (!userIdString || !yearString || !monthString) {
+      res.status(400).json({ error: 'User ID, year, and month are required' });
+      return;
+    }
+
+    const userId = parseInt(userIdString, 10);
+    const year = parseInt(yearString as string, 10);
+    const month = parseInt(monthString as string, 10);
+
+    if (isNaN(userId) || isNaN(year) || isNaN(month)) {
+      res.status(400).json({ error: 'Invalid ID, year, or month format' });
+      return;
+    }
+
+    // Validate month range
+    if (month < 1 || month > 12) {
+      res.status(400).json({ error: 'Month must be between 1 and 12' });
+      return;
+    }
+
+    const spendings = await budgetService.getUserSpendings(userId, year, month);
+    res.status(200).json({ 
+      message: 'User spendings retrieved successfully', 
+      data: spendings 
+    });
+  } catch (err) {
+    next(err);
+  }
+};
+

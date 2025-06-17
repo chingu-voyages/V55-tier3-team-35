@@ -1,7 +1,7 @@
 import { Eye, EyeOff, Target, ChevronLeft } from 'lucide-react';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 
 import Spinner from '@/components/general/spinner';
 import { Button } from '@/components/ui/button';
@@ -21,6 +21,8 @@ const LoginPage = () => {
   const [isLoading, setIsLoading] = useState(false);
   const { authLogin } = useAuthStore();
   const navigate = useNavigate();
+  const location = useLocation();
+  const from = (location.state as { from?: { pathname: string } })?.from?.pathname || '/overview';
 
   const togglePasswordVisibility = () => {
     setShowPassword(!showPassword);
@@ -34,7 +36,7 @@ const LoginPage = () => {
     try {
       const response = await authLogin(data);
       if (response.user.defaultCurrencyId) {
-        navigate('/overview');
+        navigate(from);
       } else {
         navigate('/user-details');
       }

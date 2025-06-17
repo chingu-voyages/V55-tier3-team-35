@@ -3,10 +3,12 @@ export interface BudgetFormData {
   maximum: string;
   theme: string;
   spending?: string;
+  category_id?: number;
 }
 
 export interface Budget {
   id: string;
+  category_id: number;
   category: string;
   maximum: number;
   theme: string;
