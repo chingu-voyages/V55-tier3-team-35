@@ -3,6 +3,7 @@ import { create } from 'zustand';
 import { DEL, GET } from '@/api/api';
 import { TRANSACTION_ENDPOINTS } from '@/api/constants';
 import type { Transaction } from '@/schemas/transactionFormSchema';
+
 import { useAuthStore } from './authStores';
 
 interface TransactionState {
@@ -37,9 +38,10 @@ export const useTransactionStore = create<TransactionState>()((set, get) => ({
     set({ isLoadingTransactions: true, error: null });
 
     try {
-      const response = await GET(TRANSACTION_ENDPOINTS.LIST_BY_USER(authState.user.id));
+      const response = await GET(
+        TRANSACTION_ENDPOINTS.LIST_BY_USER(authState.user.id),
+      );
       const transactionData = response.data;
-      console.log(`transaction data received from Backend: ${transactionData}`);
       set({
         transactions: transactionData,
         isLoadingTransactions: false,
@@ -68,9 +70,9 @@ export const useTransactionStore = create<TransactionState>()((set, get) => ({
     }
 
     const currentTransactions = get().transactions;
-    
+
     set({
-      transactions: currentTransactions.filter(t => t.id !== id),
+      transactions: currentTransactions.filter((t) => t.id !== id),
     });
 
     try {

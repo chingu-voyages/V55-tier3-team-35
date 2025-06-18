@@ -16,8 +16,10 @@ import {
   type Currency,
 } from './../types/stores.d';
 
-
-type PersistedAuthState = Pick<AuthState, 'isAuthenticated' | 'user' | 'defaultCurrencyId'>;
+type PersistedAuthState = Pick<
+  AuthState,
+  'isAuthenticated' | 'user' | 'defaultCurrencyId'
+>;
 
 export const useAuthStore = create<AuthState>()(
   persist(
@@ -100,7 +102,10 @@ export const useAuthStore = create<AuthState>()(
           set(newState);
         } catch (error) {
           console.error('Auth check failed:', error);
-          if (error instanceof Error && !error.message.includes('Network Error')) {
+          if (
+            error instanceof Error &&
+            !error.message.includes('Network Error')
+          ) {
             set({
               isAuthenticated: false,
               user: { id: null, username: null },
@@ -120,7 +125,8 @@ export const useAuthStore = create<AuthState>()(
           }
 
           const currenciesResponse = await GET(CURRENCY_ENDPOINTS.LIST);
-          const currencies: Currency[] = currenciesResponse.data || currenciesResponse;
+          const currencies: Currency[] =
+            currenciesResponse.data || currenciesResponse;
 
           const selectedCurrency = currencies.find(
             (currency) => currency.id === data.default_currency_id,
@@ -164,6 +170,6 @@ export const useAuthStore = create<AuthState>()(
         user: state.user,
         defaultCurrencyId: state.defaultCurrencyId,
       }),
-    }
-  )
+    },
+  ),
 );

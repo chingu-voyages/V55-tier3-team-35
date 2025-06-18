@@ -1,7 +1,6 @@
 import type { NextFunction, Request, Response } from 'express';
 
 import { env } from '../schemas/env';
-import type { Params } from '../schemas/paramsSchema';
 import { transactionService } from '../services/transaction.service';
 import {
   createTransactionSchema,

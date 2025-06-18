@@ -1,28 +1,36 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { Navigate } from 'react-router-dom';
 
 import CategoryCard from '@/components/dashboard/budget/categories/categoryCard';
 import BudgetHeader from '@/components/dashboard/budget/header/budgetHeader';
 import BudgetPieChart from '@/components/dashboard/budget/pieChart/budgetPieChart';
+import BudgetsPageSkeleton from '@/components/skeleton/budgetSkeleton';
 import { useAuthStore } from '@/stores/authStores';
 import { useBudgetStore } from '@/stores/budgetStore';
 
-const BudgetsPage: React.FC = () => {
+const BudgetsPage = () => {
   const { budgets, fetchBudgets } = useBudgetStore();
   const { isLoading, isAuthenticated, user } = useAuthStore();
-
+  const [loadingBudgets, setLoadingBudgets] = useState(false);
   useEffect(() => {
     if (!user?.id) return;
-    
+
     const init = async () => {
-      await fetchBudgets();
+      setLoadingBudgets(true);
+      try {
+        await fetchBudgets();
+      } catch (error) {
+        console.error('Failed to fetch budgets:', error);
+      } finally {
+        setLoadingBudgets(false);
+      }
     };
 
     init();
   }, [fetchBudgets, user?.id]);
 
-  if (isLoading) {
-    return <div className="text-center text-gray-500">Loading...</div>;
+  if (isLoading || loadingBudgets) {
+    return <BudgetsPageSkeleton></BudgetsPageSkeleton>;
   }
   if (!isAuthenticated) {
     return <Navigate to="/login" replace />;
@@ -42,8 +50,13 @@ const BudgetsPage: React.FC = () => {
       ) : (
         <div className="flex items-center justify-center min-h-[400px]">
           <div className="bg-white rounded-lg p-8 text-center">
-            <p className="text-lg font-medium text-Gray-900 mb-2">No budgets found</p>
-            <p className="text-sm text-Gray-500">Add budgets to keep track of your spending and stay on top of your financial goals.</p>
+            <p className="text-lg font-medium text-Gray-900 mb-2">
+              No budgets found
+            </p>
+            <p className="text-sm text-Gray-500">
+              Add budgets to keep track of your spending and stay on top of your
+              financial goals.
+            </p>
           </div>
         </div>
       )}

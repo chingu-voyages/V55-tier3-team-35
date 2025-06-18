@@ -40,8 +40,9 @@ export const useCategoryStore = create<CategoryState>()((set) => ({
 
     set({ isLoadingCategories: true, error: null });
     try {
-      const response = await GET(CATEGORY_ENDPOINTS.LIST_BY_USER(authState.user.id));
-      console.log("Categories response:", response);
+      const response = await GET(
+        CATEGORY_ENDPOINTS.LIST_BY_USER(authState.user.id),
+      );
       const categoriesData = response.data;
       set({
         categories: categoriesData,
