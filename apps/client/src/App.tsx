@@ -1,8 +1,8 @@
 import { useEffect } from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 
-import BudgetsPage from './components/dashboard/tabs/budgets.tsx';
-import ProtectedRoute from './components/general/protectedRoute.tsx';
+import BudgetsPage from './components/dashboard/tabs/budgets';
+import ProtectedRoute from './components/general/protectedRoute';
 import Error from './error';
 import LoginPage from './pages/Auth/LoginPage';
 import RegisterPage from './pages/Auth/RegisterPage';
@@ -18,14 +18,6 @@ function App() {
   useEffect(() => {
     checkAuth();
   }, [checkAuth]);
-
-  if (isLoading) {
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="text-lg">Loading...</div>
-      </div>
-    );
-  }
 
   return (
     <Routes>
@@ -47,7 +39,7 @@ function App() {
         path="/overview"
         element={
           <ProtectedRoute useLayout={true}>
-            <HomePage />
+            <HomePage isLoading={isLoading} />
           </ProtectedRoute>
         }
       />

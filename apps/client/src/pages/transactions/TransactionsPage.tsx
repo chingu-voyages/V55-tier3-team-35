@@ -23,8 +23,10 @@ const TransactionPage = () => {
     Transaction | undefined
   >();
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
-  const [selectedTransaction, setSelectedTransaction] = useState<Transaction | null>(null);
-  const { fetchCategories, isLoadingCategories, categories } = useCategoryStore();
+  const [selectedTransaction, setSelectedTransaction] =
+    useState<Transaction | null>(null);
+  const { fetchCategories, isLoadingCategories, categories } =
+    useCategoryStore();
   const { transactions, isLoadingTransactions, fetchTransactions } =
     useTransactionStore();
 
@@ -130,7 +132,12 @@ const TransactionPage = () => {
                         ${parseFloat(transaction.amount).toFixed(2)}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
-                        {categories.find(category => category.id === transaction.category_id)?.name}
+                        {
+                          categories.find(
+                            (category) =>
+                              category.id === transaction.category_id,
+                          )?.name
+                        }
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                         {new Date(
@@ -153,7 +160,11 @@ const TransactionPage = () => {
                       <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                         <DropdownMenu>
                           <DropdownMenuTrigger asChild>
-                            <Button variant="ghost" size="icon" className="h-6 w-6">
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="h-6 w-6"
+                            >
                               <MoreHorizontal className="w-4 h-4 text-Gray-500" />
                             </Button>
                           </DropdownMenuTrigger>
@@ -168,7 +179,9 @@ const TransactionPage = () => {
                               Edit Transaction
                             </DropdownMenuItem>
                             <DropdownMenuItem
-                              onClick={() => handleOpenDeleteDialog(transaction)}
+                              onClick={() =>
+                                handleOpenDeleteDialog(transaction)
+                              }
                               className="cursor-pointer hover:bg-Gray-100 text-Red"
                             >
                               Delete Transaction

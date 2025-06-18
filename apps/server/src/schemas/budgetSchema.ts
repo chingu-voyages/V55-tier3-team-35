@@ -6,14 +6,15 @@ export const budgetSchema = z.object({
   budget_amount: z.number(),
   month: z.number().min(1).max(12),
   year: z.number().min(2025).max(2100),
+  total_spent: z.number(),
 });
 
 export const updateBudgetSchema = z.object({
   budget_amount: z.number().optional(),
   month: z.number().min(1).max(12).optional(),
   year: z.number().min(2025).max(2100).optional(),
+  total_spent: z.number(),
 });
-
 
 export const budgetResponseSchema = z.object({
   id: z.number(),
@@ -23,6 +24,7 @@ export const budgetResponseSchema = z.object({
   month: z.number(),
   year: z.number(),
   created_at: z.date().optional(),
+  total_spent: z.number(),
 });
 
 export type Budget = z.infer<typeof budgetSchema>;

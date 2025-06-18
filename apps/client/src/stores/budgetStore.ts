@@ -1,28 +1,34 @@
 import { create } from 'zustand';
 
-import { CATEGORY_THEME_MAP, CATEGORY_OPTIONS } from '@/constants/budgetOptions';
-import type { Budget, BudgetFormData } from '@/types/budget.types';
+import { BUDGET_ENDPOINTS } from '@/api/constants';
+import {
+  CATEGORY_THEME_MAP,
+  CATEGORY_OPTIONS,
+} from '@/constants/budgetOptions';
 import { useAuthStore } from '@/stores/authStores';
 import { useCategoryStore } from '@/stores/categoryStore';
-import { BUDGET_ENDPOINTS } from '@/api/constants';
+import type { Budget, BudgetFormData } from '@/types/budget.types';
 
 import { POST, PATCH, GET as apiGet, DEL } from '../api/api';
 
 const transformServerBudget = async (serverBudget: any): Promise<Budget> => {
   const maximum = Number(serverBudget.budget_amount);
-  const spending = serverBudget.spending !== undefined ? Number(serverBudget.spending) : 0;
-  
+  const spending =
+    serverBudget.spending !== undefined ? Number(serverBudget.spending) : 0;
+
   let categoryName = '';
   if (serverBudget.categories?.name) {
     categoryName = serverBudget.categories.name;
   } else {
     const categoryStore = useCategoryStore.getState();
-    
+
     if (!categoryStore.hasFetched) {
       await categoryStore.fetchCategories();
     }
-    
-    const category = categoryStore.categories.find(cat => cat.id === serverBudget.category_id);
+
+    const category = categoryStore.categories.find(
+      (cat) => cat.id === serverBudget.category_id,
+    );
     if (!category) {
       console.error('Category not found for budget:', serverBudget);
       categoryName = 'Unknown Category';
@@ -30,7 +36,7 @@ const transformServerBudget = async (serverBudget: any): Promise<Budget> => {
       categoryName = category.name;
     }
   }
-  
+
   return {
     id: serverBudget.id.toString(),
     category_id: serverBudget.category_id,
@@ -63,7 +69,11 @@ interface BudgetStore {
   fetchBudgets: () => Promise<void>;
   clearError: () => void;
   hasFetchedBudgets: boolean;
-  updateTotals: (totals: { totalSpending: number; totalMaximum: number; totalRemaining: number }) => void;
+  updateTotals: (totals: {
+    totalSpending: number;
+    totalMaximum: number;
+    totalRemaining: number;
+  }) => void;
 }
 
 export const useBudgetStore = create<BudgetStore>((set, get) => ({
@@ -97,7 +107,9 @@ export const useBudgetStore = create<BudgetStore>((set, get) => ({
 
       const [budgetsResponse, spendingResponse] = await Promise.all([
         apiGet(BUDGET_ENDPOINTS.LIST_BY_USER(userId)),
-        apiGet(`${BUDGET_ENDPOINTS.GET_USER_SPENDING(userId)}?year=${currentYear}&month=${currentMonth}`)
+        apiGet(
+          `${BUDGET_ENDPOINTS.GET_USER_SPENDING(userId)}?year=${currentYear}&month=${currentMonth}`,
+        ),
       ]);
 
       if (!budgetsResponse.data) {
@@ -106,13 +118,18 @@ export const useBudgetStore = create<BudgetStore>((set, get) => ({
 
       const spendingMap = new Map();
       if (spendingResponse.data?.budgets) {
-        spendingResponse.data.budgets.forEach((budgetSpending: { categoryId: number; spentAmount: number }) => {
-          spendingMap.set(budgetSpending.categoryId, budgetSpending.spentAmount);
-        });
+        spendingResponse.data.budgets.forEach(
+          (budgetSpending: { categoryId: number; spentAmount: number }) => {
+            spendingMap.set(
+              budgetSpending.categoryId,
+              budgetSpending.spentAmount,
+            );
+          },
+        );
       }
 
       const categories = categoryStore.categories;
-      const categoryMap = new Map(categories.map(cat => [cat.id, cat]));
+      const categoryMap = new Map(categories.map((cat) => [cat.id, cat]));
 
       const transformedBudgets = await Promise.all(
         budgetsResponse.data.map(async (serverBudget: any) => {
@@ -134,13 +151,13 @@ export const useBudgetStore = create<BudgetStore>((set, get) => ({
             remaining: maximum - spending,
             theme: CATEGORY_THEME_MAP[category.name.toLowerCase()] || 'Green',
           };
-        })
-      ).then(budgets => budgets.filter(Boolean)); 
-      
+        }),
+      ).then((budgets) => budgets.filter(Boolean));
+
       set({
         budgets: transformedBudgets,
         ...calculateTotals(transformedBudgets),
-        hasFetchedBudgets: true
+        hasFetchedBudgets: true,
       });
     } catch (error) {
       console.error('Failed to fetch budgets:', error);
@@ -157,14 +174,14 @@ export const useBudgetStore = create<BudgetStore>((set, get) => ({
 
     const maximum = Number(budgetData.maximum);
     const spending = Number(budgetData.spending) || 0;
-    
+
     const categoryStore = useCategoryStore.getState();
     if (!categoryStore.hasFetched) {
       await categoryStore.fetchCategories();
     }
-    
+
     const serverCategory = categoryStore.categories.find(
-      cat => cat.name.toLowerCase() === budgetData.category.toLowerCase()
+      (cat) => cat.name.toLowerCase() === budgetData.category.toLowerCase(),
     );
 
     if (!serverCategory) {
@@ -208,16 +225,18 @@ export const useBudgetStore = create<BudgetStore>((set, get) => ({
 
       set((state) => ({
         budgets: state.budgets.map((budget) =>
-          budget.id === tempId ? savedBudget : budget
+          budget.id === tempId ? savedBudget : budget,
         ),
-        ...calculateTotals(state.budgets.map((budget) =>
-          budget.id === tempId ? savedBudget : budget
-        ))
+        ...calculateTotals(
+          state.budgets.map((budget) =>
+            budget.id === tempId ? savedBudget : budget,
+          ),
+        ),
       }));
     } catch (error) {
       console.error('Failed to add budget:', error);
       set({ error: 'Failed to add budget' });
-      const currentBudgets = get().budgets.filter(b => b.id !== tempId);
+      const currentBudgets = get().budgets.filter((b) => b.id !== tempId);
       set({
         budgets: currentBudgets,
         ...calculateTotals(currentBudgets),
@@ -253,7 +272,7 @@ export const useBudgetStore = create<BudgetStore>((set, get) => ({
 
     if (updates.category) {
       const categoryOption = CATEGORY_OPTIONS.find(
-        opt => opt.value === updates.category
+        (opt) => opt.value === updates.category,
       );
       if (categoryOption) {
         newCategory = categoryOption.label;
@@ -271,7 +290,7 @@ export const useBudgetStore = create<BudgetStore>((set, get) => ({
       theme: newTheme,
     };
     const updatedBudgets = currentBudgets.map((budget) =>
-      budget.id === id ? updatedBudget : budget
+      budget.id === id ? updatedBudget : budget,
     );
 
     set({
@@ -284,28 +303,33 @@ export const useBudgetStore = create<BudgetStore>((set, get) => ({
         const serverUpdateData = {
           budget_amount: newMaximum,
           month: new Date().getMonth() + 1,
-          year: Math.max(2025, new Date().getFullYear())
+          year: Math.max(2025, new Date().getFullYear()),
         };
 
-        const response = await PATCH(BUDGET_ENDPOINTS.UPDATE(Number(id), userId), serverUpdateData);
+        const response = await PATCH(
+          BUDGET_ENDPOINTS.UPDATE(Number(id), userId),
+          serverUpdateData,
+        );
         if (!response.data) {
           throw new Error('No response data received');
         }
 
         const updatedServerBudget = {
-          ...await transformServerBudget(response.data),
+          ...(await transformServerBudget(response.data)),
           spending: newSpending,
           remaining: newMaximum - newSpending,
-          theme: newTheme
+          theme: newTheme,
         };
 
         set((state) => ({
           budgets: state.budgets.map((budget) =>
-            budget.id === id ? updatedServerBudget : budget
+            budget.id === id ? updatedServerBudget : budget,
           ),
-          ...calculateTotals(state.budgets.map((budget) =>
-            budget.id === id ? updatedServerBudget : budget
-          ))
+          ...calculateTotals(
+            state.budgets.map((budget) =>
+              budget.id === id ? updatedServerBudget : budget,
+            ),
+          ),
         }));
       } catch (error) {
         console.error('Failed to update budget:', error);
